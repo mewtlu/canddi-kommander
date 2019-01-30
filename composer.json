@@ -1,0 +1,18 @@
+{
+    "name": "dblencowe/canddi-kommander",
+    "type": "project",
+    "authors": [
+        {
+            "name": "Dave Blencowe",
+            "email": "dave.blencowe@thejust-group.com"
+        }
+    ],
+    "require": {
+        "symfony/console": "^4.2"
+    },
+    "autoload": {
+	"psr-4": {
+		"Dblencowe\\CanddiKommander\\": "src/"
+	}
+    }
+}
