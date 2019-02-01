@@ -23,3 +23,29 @@ collaborators:
 
   - username: dblencowe
     permission: admin
+
+branches:
+  - name: master
+    protection:
+      enforce_admins: false
+      required_pull_request_reviews:
+        dismiss_stale_reviews: true
+      required_status_checks:
+        strict: true
+        contexts: ['WIP']
+      restrictions:
+        users: []
+        teams: []
+  - name: develop
+    protection:
+      enforce_admins: false
+      required_pull_request_reviews:
+        dismiss_stale_reviews: true
+      required_status_checks:
+        strict: true
+        contexts: ['WIP']
+      restrictions:
+        users: [
+          '@timlangley'
+        ]
+        teams: []
