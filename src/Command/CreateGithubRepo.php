@@ -5,6 +5,7 @@ namespace Dblencowe\CanddiKommander\Command;
 use Dblencowe\CanddiKommander\Application;
 use Github\Client;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -16,17 +17,7 @@ class CreateGithubRepo extends Command
     /** @var OutputInterface $output */
     private $output;
     private $branches = ['develop', 'master'];
-    private $branchProtectionRules = [
-        'required_status_checks' => [
-            'strict' => true,
-            'contexts' => ['WIP'],
-        ],
-        'required_pull_request_reviews' => [
-            'include_admins' => true,
-        ],
-        'enforce_admins' => true,
-        'restrictions' => null,
-    ];
+    private $app;
 
     public function __construct(Client $githubClient)
     {
@@ -55,7 +46,6 @@ class CreateGithubRepo extends Command
         );
         $this->commitSkeleton($repo['owner']['login'], $repo['name']);
         $this->createBranches($repo['owner']['login'], $repo['name']);
-        $this->updateBranchProtection($repo['owner']['login'], $repo['name']);
 
         $output->write('Created repository successfully at ' . $repo['html_url']);
     }
@@ -86,23 +76,17 @@ class CreateGithubRepo extends Command
 
     private function commitSkeleton(string $owner, string $name)
     {
-        $path = $this->getApplication()->getInternalStoragePath() . '/skeleton/';
-        $files = $this->getDirectoryContents($path);
-        foreach($files as $filePath) {
-            $repoPath = str_replace(realpath($path) . '/', '', $filePath);
-            $contents = file_get_contents($filePath);
-            if ($repoPath === '.github/settings.yml') {
-                $contents = str_replace('{{ REPO_NAME }}', $name, $contents);
-            }
+        $app = $this->getApplication();
+        $command = $app->find('git:sync-skeleton');
+        foreach ($this->branches as $branchName) {
+            $input = new ArrayInput([
+                'command' => 'git:sync-skeleton',
+                'organisation' => $owner,
+                'name' => $name,
+                'branch' => $branchName,
+            ]);
 
-            $this->githubClient->api('repo')->contents()->create(
-                $owner,
-                $name,
-                $repoPath,
-                $contents,
-                "Added $repoPath to the repository",
-                'master'
-            );
+            $command->run($input, $this->output);
         }
     }
 
@@ -121,30 +105,5 @@ class CreateGithubRepo extends Command
                 $this->output->writeln("<info>$branchName already exists. Skipping.</info>");
             }
         }
-    }
-
-    private function updateBranchProtection(string $owner, string $name)
-    {
-        foreach ($this->branches as $branchName) {
-            $this->githubClient->repo()->protection()->updateStatusChecks($owner, $name, $branchName, $this->branchProtectionRules);
-        }
-    }
-
-    private function getDirectoryContents(string $directory, array &$results = []): array
-    {
-        $files = scandir($directory, SCANDIR_SORT_ASCENDING);
-        foreach ($files as $key => $value) {
-            $path = realpath($directory . DIRECTORY_SEPARATOR . $value);
-            if (! is_dir($path)) {
-                $results[] = $path;
-                continue;
-            }
-
-            if (! in_array($value, ['.', '..'])) {
-                $this->getDirectoryContents($path, $results);
-            }
-        }
-
-        return $results;
     }
 }
