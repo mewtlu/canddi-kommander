@@ -13,30 +13,19 @@ class CreateGithubRepo extends Command
 {
     protected static $defaultName = 'git:create-repo';
     private $githubClient;
-    private $defaultBranch = 'develop';
-    private $branches = [
-        'develop' => [
-            'required_status_checks' => [
-                'strict' => true,
-                'contexts' => ['WIP'],
-            ],
-            'required_pull_request_reviews' => [
-                'include_admins' => true,
-            ],
-            'enforce_admins' => true,
-            'restrictions' => null,
+    /** @var OutputInterface $output */
+    private $output;
+    private $branches = ['develop', 'master'];
+    private $branchProtectionRules = [
+        'required_status_checks' => [
+            'strict' => true,
+            'contexts' => ['WIP'],
         ],
-        'master' => [
-            'required_status_checks' => [
-                'strict' => true,
-                'contexts' => ['WIP'],
-            ],
-            'required_pull_request_reviews' => [
-                'include_admins' => true,
-            ],
-            'enforce_admins' => true,
-            'restrictions' => null,
+        'required_pull_request_reviews' => [
+            'include_admins' => true,
         ],
+        'enforce_admins' => true,
+        'restrictions' => null,
     ];
 
     public function __construct(Client $githubClient)
@@ -57,16 +46,16 @@ class CreateGithubRepo extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $this->output = $output;
         $this->authenticate();
-//        $repo = $this->createRepository(
-//            $input->getArgument('name'),
-//            $input->getArgument('public') ?? false,
-//            $input->getArgument('organisation') ?? null
-//        );
-//        $this->commitSkeleton($repo['owner']['login'], $repo['name']);
-//        $this->createBranches($repo['owner']['login'], $repo['name']);
-//        $this->updateBranchProtection($repo['owner']['login'], $repo['name']);
-        $this->updateDefaultBranch('visualsignal', 'test');
+        $repo = $this->createRepository(
+            $input->getArgument('name'),
+            $input->getArgument('public') ?? false,
+            $input->getArgument('organisation') ?? null
+        );
+        $this->commitSkeleton($repo['owner']['login'], $repo['name']);
+        $this->createBranches($repo['owner']['login'], $repo['name']);
+        $this->updateBranchProtection($repo['owner']['login'], $repo['name']);
 
         $output->write('Created repository successfully at ' . $repo['html_url']);
     }
@@ -101,11 +90,16 @@ class CreateGithubRepo extends Command
         $files = $this->getDirectoryContents($path);
         foreach($files as $filePath) {
             $repoPath = str_replace(realpath($path) . '/', '', $filePath);
+            $contents = file_get_contents($filePath);
+            if ($repoPath === '.github/settings.yml') {
+                $contents = str_replace('{{ REPO_NAME }}', $name, $contents);
+            }
+
             $this->githubClient->api('repo')->contents()->create(
                 $owner,
                 $name,
                 $repoPath,
-                file_get_contents($filePath),
+                $contents,
                 "Added $repoPath to the repository",
                 'master'
             );
@@ -115,22 +109,25 @@ class CreateGithubRepo extends Command
     private function createBranches(string $owner, string $name)
     {
         $latestSha = $this->githubClient->repo()->commits()->all($owner, $name, [])[0]['sha'];
-        foreach($this->branches as $branchName => $details) {
+        foreach($this->branches as $branchName) {
             $data = ['ref' => 'refs/heads/' . $branchName, 'sha' => $latestSha];
-            $this->githubClient->gitData()->references()->create($owner, $name, $data);
+            try {
+                $this->githubClient->gitData()->references()->create($owner, $name, $data);
+            } catch(\RuntimeException $e) {
+                if ($e->getMessage() !== 'Reference already exists') {
+                    throw $e;
+                }
+
+                $this->output->writeln("<info>$branchName already exists. Skipping.</info>");
+            }
         }
     }
 
     private function updateBranchProtection(string $owner, string $name)
     {
-        foreach ($this->branches as $branchName => $protectionInfo) {
-            $this->githubClient->repo()->protection()->updateStatusChecks($owner, $name, $branchName, $protectionInfo);
+        foreach ($this->branches as $branchName) {
+            $this->githubClient->repo()->protection()->updateStatusChecks($owner, $name, $branchName, $this->branchProtectionRules);
         }
-    }
-
-    private function updateDefaultBranch(string $owner, string $name)
-    {
-        $this->githubClient->repo()->update($owner, $name, ['default_branch' => 'develop']);
     }
 
     private function getDirectoryContents(string $directory, array &$results = []): array
