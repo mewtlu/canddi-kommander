@@ -9,7 +9,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 class CreateDefaultBranches extends GithubCommand
 {
     protected static $defaultName = 'git:create-default-branches';
-    private $branches = ['develop', 'master'];
+    private $branches = ['master', 'develop'];
 
     protected function configure()
     {
@@ -22,6 +22,7 @@ class CreateDefaultBranches extends GithubCommand
 
     public function execute(InputInterface $input, OutputInterface $output)
     {
+        $this->authenticate();
         $owner = $input->getArgument('organisation');
         $name = $input->getArgument('name');
         $latestSha = $this->githubClient->repo()->commits()->all($owner, $name, [])[0]['sha'];

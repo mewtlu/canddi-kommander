@@ -33,7 +33,7 @@ class RunCommandAgainstRepoCollection extends GithubCommand
             $this->createDefaultBranches($input->getArgument('organisation'), $repo['name']);
             $output->writeln(sprintf('Synched skeleton to %s/%s on branch %s', $input->getArgument('organisation'), $repo['name'], $repo['default_branch']));
         }
-        $output->writeln('<success>Command finished!</success>');
+        $output->writeln('<info>Command finished!</info>');
     }
 
     private function createDefaultBranches(string $owner, string $name)
