@@ -46,6 +46,6 @@ branches:
         contexts: ['WIP']
       restrictions:
         users: [
-          '@timlangley'
+          'timlangley'
         ]
         teams: []
