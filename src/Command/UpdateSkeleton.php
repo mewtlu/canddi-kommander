@@ -3,21 +3,13 @@
 namespace Dblencowe\CanddiKommander\Command;
 
 use Github\Client;
-use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class UpdateSkeleton extends Command
+class UpdateSkeleton extends GithubCommand
 {
     protected static $defaultName = 'git:sync-skeleton';
-    private $githubClient;
-
-    public function __construct(Client $githubClient)
-    {
-        $this->githubClient = $githubClient;
-        parent::__construct(self::$defaultName);
-    }
 
     protected function configure()
     {
@@ -56,7 +48,7 @@ class UpdateSkeleton extends Command
 
                 $this->updateFile($owner, $name, $repoPath, $contents, $branch, $oldFile['sha']);
             } catch(\RuntimeException $e) {
-                if ($e->getMessage() !== 'Not Found') {
+                if (! in_array($e->getMessage(), ['Not Found', 'This repository is empty.'])) {
                     throw $e;
                 }
 
@@ -108,15 +100,5 @@ class UpdateSkeleton extends Command
         }
 
         return $results;
-    }
-
-    private function authenticate()
-    {
-        $app = $this->getApplication();
-        $this->githubClient->authenticate(
-            $app->getEnv()->get('GITHUB_USERNAME'),
-            $app->getEnv()->get('GITHUB_PAT'),
-            Client::AUTH_HTTP_PASSWORD
-        );
     }
 }

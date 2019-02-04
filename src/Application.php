@@ -64,5 +64,7 @@ class Application extends \Symfony\Component\Console\Application
         $this->add(new \Dblencowe\CanddiKommander\Command\HelloWorld());
         $this->add(new \Dblencowe\CanddiKommander\Command\CreateGithubRepo(GenericFactory::makeGitHubClient()));
         $this->add(new \Dblencowe\CanddiKommander\Command\UpdateSkeleton(GenericFactory::makeGitHubClient()));
+        $this->add(new \Dblencowe\CanddiKommander\Command\RunCommandAgainstRepoCollection(GenericFactory::makeGitHubClient()));
+        $this->add(new \Dblencowe\CanddiKommander\Command\CreateDefaultBranches(GenericFactory::makeGitHubClient()));
     }
 }
