@@ -12,7 +12,7 @@ class Env
     {
         $this->environment = $_ENV;
         if (empty($this->environment)) {
-            throw new EnvironmentException("Unable to load environment", EnvironmentException::CODE_COMPLETE_ENV_FAILURE);
+            throw new EnvironmentException('Unable to load environment', EnvironmentException::CODE_COMPLETE_ENV_FAILURE);
         }
     }
 
