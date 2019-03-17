@@ -1,8 +1,8 @@
 <?php
 
-namespace Dblencowe\CanddiKommander;
+namespace CanddiKommander;
 
-use Dblencowe\CanddiKommander\Handler\Env;
+use CanddiKommander\Handler\Env;
 use Github\Client;
 
 class GenericFactory

@@ -1,8 +1,8 @@
 <?php
 
-namespace Dblencowe\CanddiKommander;
+namespace CanddiKommander;
 
-use Dblencowe\CanddiKommander\Exception\ApplicationException;
+use CanddiKommander\Exception\ApplicationException;
 use Symfony\Component\Console\Output\ConsoleOutput;
 
 class Application extends \Symfony\Component\Console\Application
@@ -61,10 +61,9 @@ class Application extends \Symfony\Component\Console\Application
 
     private function registerCommands()
     {
-        $this->add(new \Dblencowe\CanddiKommander\Command\HelloWorld());
-        $this->add(new \Dblencowe\CanddiKommander\Command\CreateGithubRepo(GenericFactory::makeGitHubClient()));
-        $this->add(new \Dblencowe\CanddiKommander\Command\UpdateSkeleton(GenericFactory::makeGitHubClient()));
-        $this->add(new \Dblencowe\CanddiKommander\Command\RunCommandAgainstRepoCollection(GenericFactory::makeGitHubClient()));
-        $this->add(new \Dblencowe\CanddiKommander\Command\CreateDefaultBranches(GenericFactory::makeGitHubClient()));
+        $this->add(new \CanddiKommander\Command\CreateGithubRepo(GenericFactory::makeGitHubClient()));
+        $this->add(new \CanddiKommander\Command\UpdateSkeleton(GenericFactory::makeGitHubClient()));
+        $this->add(new \CanddiKommander\Command\RunCommandAgainstRepoCollection(GenericFactory::makeGitHubClient()));
+        $this->add(new \CanddiKommander\Command\CreateDefaultBranches(GenericFactory::makeGitHubClient()));
     }
 }

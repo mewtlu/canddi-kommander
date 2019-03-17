@@ -3,5 +3,5 @@
 
 require __DIR__ . '/vendor/autoload.php';
 
-$application = new \Dblencowe\CanddiKommander\Application();
+$application = new \CanddiKommander\Application();
 $application->run();

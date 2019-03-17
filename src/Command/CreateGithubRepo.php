@@ -1,6 +1,6 @@
 <?php
 
-namespace Dblencowe\CanddiKommander\Command;
+namespace CanddiKommander\Command;
 
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputArgument;
@@ -13,32 +13,32 @@ class CreateGithubRepo extends GithubCommand
     private $output;
     private $branches = ['develop', 'master'];
 
-
-    protected function configure()
+    private function commitSkeleton(string $owner, string $name)
     {
-        $this
-            ->setDescription('Create a new repository on GitHub')
-            ->setHelp('Create a new repository on GitHub and optionally copy over skeleton')
-            ->addArgument('name', InputArgument::REQUIRED, 'The name of the repository to be created')
-            ->addArgument('public', InputArgument::OPTIONAL, 'Whether or not the repository should be public (default false)')
-            ->addArgument('organisation', InputArgument::OPTIONAL, 'The organisation to create the repository within');
-    }
+        $app = $this->getApplication();
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+        $command = $app->find('git:sync-skeleton');
+        $input = new ArrayInput([
+            'command' => 'git:sync-skeleton',
+            'organisation' => $owner,
+            'name' => $name,
+            'branch' => 'develop',
+        ]);
+
+        $command->run($input, $this->output);
+    }
+    private function createBranches(string $owner, string $name)
     {
-        $this->output = $output;
-        $this->authenticate();
-        $repo = $this->createRepository(
-            $input->getArgument('name'),
-            $input->getArgument('public') ?? false,
-            $input->getArgument('organisation') ?? null
-        );
-        $this->commitSkeleton($repo['owner']['login'], $repo['name']);
-        $this->createBranches($repo['owner']['login'], $repo['name']);
+        $app = $this->getApplication();
+        $command = $app->find('git:create-default-branches');
+        $input = new ArrayInput([
+            'command' => 'git:create-default-branches',
+            'organisation' => $owner,
+            'name' => $name,
+        ]);
 
-        $output->write('Created repository successfully at ' . $repo['html_url']);
+        $command->run($input, $this->output);
     }
-
     private function createRepository(string $name, bool $public = false, ?string $organisation = null): array
     {
         $response = $this->githubClient->repos()->create(
@@ -51,33 +51,35 @@ class CreateGithubRepo extends GithubCommand
 
         return $response;
     }
-
-    private function commitSkeleton(string $owner, string $name)
+    protected function configure()
     {
-        $app = $this->getApplication();
-        $command = $app->find('git:sync-skeleton');
-        foreach ($this->branches as $branchName) {
-            $input = new ArrayInput([
-                'command' => 'git:sync-skeleton',
-                'organisation' => $owner,
-                'name' => $name,
-                'branch' => $branchName,
-            ]);
-
-            $command->run($input, $this->output);
-        }
+        $this
+            ->setDescription('Create a new repository on GitHub')
+            ->setHelp('Create a new repository on GitHub and optionally copy over skeleton')
+            ->addArgument('organisation', InputArgument::REQUIRED, 'The organisation to create the repository within')
+            ->addArgument('name', InputArgument::REQUIRED, 'The name of the repository to be created')
+            ->addArgument('public', InputArgument::OPTIONAL, 'Whether or not the repository should be public (default false)');
     }
-
-    private function createBranches(string $owner, string $name)
+    protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $app = $this->getApplication();
-        $command = $app->find('git:create-default-branches');
-        $input = new ArrayInput([
-            'command' => 'git:create-default-branches',
-            'organisation' => $owner,
-            'name' => $name,
-        ]);
+        $this->output = $output;
+        $this->authenticate();
+        $repo = $this->createRepository(
+            $input->getArgument('name'),
+            $input->getArgument('public') ?? false,
+            $input->getArgument('organisation') ?? null
+        );
+        //Upload the correct skeleton files
+        $this->commitSkeleton($repo['owner']['login'], $repo['name']);
 
-        $command->run($input, $this->output);
+        //NOTE you must create branches before applying skeleton
+        $this->createBranches($repo['owner']['login'], $repo['name']);
+
+        $output->write(
+            'Created repository successfully at ' . $repo['html_url'].
+            chr(10).chr(10).
+            'Now wait a 10 seconds and run sync s.t settings bot can catch up'.
+            chr(10).chr(10)
+        );
     }
 }

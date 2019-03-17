@@ -1,6 +1,6 @@
 <?php
 
-namespace Dblencowe\CanddiKommander\Exception;
+namespace CanddiKommander\Exception;
 
 class EnvironmentException extends ApplicationException
 {

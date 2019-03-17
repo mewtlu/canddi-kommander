@@ -1,8 +1,8 @@
 <?php
 
-namespace Dblencowe\CanddiKommander\Handler;
+namespace CanddiKommander\Handler;
 
-use Dblencowe\CanddiKommander\Exception\EnvironmentException;
+use CanddiKommander\Exception\EnvironmentException;
 
 class Env
 {

@@ -1,6 +1,6 @@
 <?php
 
-namespace Dblencowe\CanddiKommander\Command;
+namespace CanddiKommander\Command;
 
 use Github\Client;
 use Symfony\Component\Console\Command\Command;
