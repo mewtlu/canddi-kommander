@@ -4,6 +4,10 @@ extends Cli_Abstract
 {
     use Canddi_Interface_Singleton;
 
+    function cliInit() {
+        $this->github = \Canddi_Helper_Github::getInstance();
+    }
+
     /**
      * Returns an array of the contexts that this controller supports
      * This looks like:
@@ -21,6 +25,7 @@ extends Cli_Abstract
             self::CONTEXT_JSONPRETTY => []
         ];
     }
+
     /**
      * Creates a repository and initalizes it with required config
      *
