@@ -1,6 +1,9 @@
 <?php
-class cli_GithubController extends Cli_Abstract
+class cli_GithubController
+extends Cli_Abstract
 {
+    use Canddi_Interface_Singleton;
+
     /**
      * Returns an array of the contexts that this controller supports
      * This looks like:
