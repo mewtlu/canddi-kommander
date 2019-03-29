@@ -1,1 +1,33 @@
-../../../composer.json
+{
+    "name"                              : "canddi/canddi-kommander",
+    "description"                       : "CANDDi Kommander",
+    "license"                           : "proprietary",
+    "minimum-stability"                 : "dev",
+    "prefer-stable"                     : true,
+   "require"                           : {
+        "guzzlehttp/guzzle"             : "6.3.0",
+        "guzzlehttp/oauth-subscriber"   : "0.3.*",
+        "phly/phly-mustache"            : "2.0.1",
+        "zendframework/zendframework1"  : "1.12.20",
+        "mcrumm/phlack"                 : "^0.7.0"
+    },
+    "require-dev"                       : {
+        "phpunit/phpunit"               : "4.8.36",
+        "mockery/mockery"               : "0.9.9",
+        "zircote/swagger-php"           : "^2.0"
+    },
+    "config"                            : {
+        "preferred-install"             : "dist"
+    },
+    "autoload": {
+        "classmap": [
+            "."
+        ]
+    },
+    "authors"                           : [
+        {
+            "name": "CANDDi",
+            "email": "hello@canddi.com"
+        }
+    ]
+}
