@@ -18,5 +18,28 @@ class cli_GithubController extends Cli_Abstract
             self::CONTEXT_JSONPRETTY => []
         ];
     }
+    /**
+     * Creates a repository and initalizes it with required config
+     *
+     * Example usage: ./scripts/callPHP.sh -a cli.github.create.post -p "repository=canddi-kommander"
+     *
+     * Parameters:
+     *   repository
+     *
+     * @return void
+     * @author Luke Roberts
+     **/
+    public function createAction_POST()
+    {
+        $strRepo                  = $this->_request->getParam('repository', null);
+        if (empty($strRepo)) {
+            throw new Canddi_Exception_Fatal_ValueCantBeNull('repository');
+        }
+
+        $config = \Canddi_Helper_Config::getInstance();
+        $this->view->assign([
+            'Repository'           => "$strRepo"
+        ]);
+    }
 }
 
