@@ -11,12 +11,17 @@ class cli_HelloControllerTest
     public function testWorldAction()
     {
         $strName      = "Logan";
+        $config = \Canddi_Helper_Config::getInstance();
+        $strGithubUsername = $config->getGithubUsername();
+        $strGithubPAT = $config->getGithubPAT();
         $this->_request->setParams([
             'name'    => $strName
         ]);
 
         $arrExpected = [
-            "Message" => "Hello $strName"
+            "Message"           => "Hello $strName",
+            'GithubUsername'    => $strGithubUsername,
+            'GithubPAT'         => $strGithubPAT
         ];
 
         $this->dispatch('cli.hello.world.get');

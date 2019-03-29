@@ -37,7 +37,12 @@ class cli_HelloController extends Cli_Abstract
             throw new Canddi_Exception_Fatal_ValueCantBeNull('name');
         }
 
-        $this->view->assign(['Message' => "Hello $strName"]);
+        $config = \Canddi_Helper_Config::getInstance();
+        $this->view->assign([
+            'Message'           => "Hello $strName",
+            'GithubUsername'    => $config->getGithubUsername(),
+            'GithubPAT'         => $config->getGithubPAT()
+        ]);
     }
 }
 
