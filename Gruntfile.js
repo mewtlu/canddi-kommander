@@ -16,7 +16,7 @@ module.exports = function (grunt) {
             php : {
                 options: {
                     log: true,
-                    task :  ['build', 'makeClassmaps', 'test'],
+                    task :  ['build', 'test'],
                     gruntOptions : {}
                 },
                 src: [('src/main/php/Gruntfile.js')]
