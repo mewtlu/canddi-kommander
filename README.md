@@ -3,8 +3,9 @@
 
 ## Installation
 - Clone this repository
+- `cd src/main/php`
 - Run `composer install` to install dependencies
-- Run `grunt php` to build and run an initial test
+- Run `grunt default` to build and run an initial test
 
 ## Invoking the CLI
 CLI controllers can be invoked via the following command:
