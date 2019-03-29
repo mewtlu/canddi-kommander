@@ -63,14 +63,14 @@ module.exports = function (grunt) {
         phpunit : objPhpunit
     });
 
-    var arrBuildTasks = ['makeClassmaps', 'string-replace', 'phplint'];
-
     grunt.registerTask(
         'makeClassmaps',
         [
             "composer:autoload:dump-autoload"
         ]
     );
+
+    var arrBuildTasks = ['string-replace', 'phplint', 'makeClassmaps'];
 
     grunt.registerTask('test', ['string-replace', 'phpunit']);
     grunt.registerTask('build', arrBuildTasks);
