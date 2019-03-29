@@ -39,14 +39,40 @@ extends Cli_Abstract
      **/
     public function createAction_POST()
     {
-        $strRepo                  = $this->_request->getParam('repository', null);
+        $strRepo = $this->_request->getParam('repository', null);
         if (empty($strRepo)) {
             throw new Canddi_Exception_Fatal_ValueCantBeNull('repository');
         }
 
-        $config = \Canddi_Helper_Config::getInstance();
         $this->view->assign([
-            'Repository'           => "$strRepo"
+            'Repository' => "$strRepo",
+            'Username' => $this->github->getUsername(),
+            'Access Token' => $this->github->getAccessToken()
+        ]);
+    }
+
+    /**
+     * Updates an existing repository with required config
+     *
+     * Example usage: ./scripts/callPHP.sh -a cli.github.update.post -p "repository=canddi-kommander"
+     *
+     * Parameters:
+     *   repository
+     *
+     * @return void
+     * @author Luke Roberts
+     **/
+    public function updateAction_POST()
+    {
+        $strRepo = $this->_request->getParam('repository', null);
+        if (empty($strRepo)) {
+            throw new Canddi_Exception_Fatal_ValueCantBeNull('repository');
+        }
+
+        $this->view->assign([
+            'Update repository' => "$strRepo",
+            'Username' => $this->github->getUsername(),
+            'Access Token' => $this->github->getAccessToken()
         ]);
     }
 }
