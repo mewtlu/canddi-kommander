@@ -9,7 +9,9 @@
 
 ## Invoking the CLI
 CLI controllers can be invoked via the following command:
+
 `./scripts/callPHP.sh -a <module>.<controller>.<action>.<verb> -p "param1=a&param2=b"`
+
 e.g. `./scripts/callPHP.sh -a cli.hello.world.get -p "name=Logan"`
 
 ## Configuration
@@ -19,5 +21,7 @@ To perform commands which require authentication you'll need to populate this fi
 ## Unit testing
 Unit tests can be invoked via the following command:
 `./scripts/phpulocal.sh <file|directory>`
+
 e.g. `./scripts/phpulocal.sh src/test/php/` for ALL tests
-They will also be ran on a `grunt php`
+
+They will also be ran on a `grunt default`
