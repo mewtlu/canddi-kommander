@@ -44,6 +44,8 @@ extends Cli_Abstract
             throw new Canddi_Exception_Fatal_ValueCantBeNull('repository');
         }
 
+        $this->github->createRepository($strRepo);
+
         $this->view->assign([
             'Repository' => "$strRepo",
             'Username' => $this->github->getUsername(),
@@ -68,6 +70,8 @@ extends Cli_Abstract
         if (empty($strRepo)) {
             throw new Canddi_Exception_Fatal_ValueCantBeNull('repository');
         }
+
+        $this->github->updateRepository($strRepo);
 
         $this->view->assign([
             'Update repository' => "$strRepo",
