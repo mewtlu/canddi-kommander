@@ -4,10 +4,6 @@ extends Cli_Abstract
 {
     use Canddi_Interface_Singleton;
 
-    function cliInit() {
-        $this->github = \Canddi_Helper_Github::getInstance();
-    }
-
     /**
      * Returns an array of the contexts that this controller supports
      * This looks like:
@@ -39,17 +35,19 @@ extends Cli_Abstract
      **/
     public function createAction_POST()
     {
+        $github = \Canddi_Helper_Github::getInstance();
+
         $strRepo = $this->_request->getParam('repository', null);
         if (empty($strRepo)) {
             throw new Canddi_Exception_Fatal_ValueCantBeNull('repository');
         }
 
-        $this->github->createRepository($strRepo);
+        $github->createRepository($strRepo);
 
         $this->view->assign([
             'Repository' => "$strRepo",
-            'Username' => $this->github->getUsername(),
-            'Access Token' => $this->github->getAccessToken()
+            'Username' => $github->getUsername(),
+            'Access Token' => $github->getAccessToken()
         ]);
     }
 
@@ -66,17 +64,19 @@ extends Cli_Abstract
      **/
     public function updateAction_POST()
     {
+        $github = \Canddi_Helper_Github::getInstance();
+
         $strRepo = $this->_request->getParam('repository', null);
         if (empty($strRepo)) {
             throw new Canddi_Exception_Fatal_ValueCantBeNull('repository');
         }
 
-        $this->github->updateRepository($strRepo);
+        $github->updateRepository($strRepo);
 
         $this->view->assign([
             'Update repository' => "$strRepo",
-            'Username' => $this->github->getUsername(),
-            'Access Token' => $this->github->getAccessToken()
+            'Username' => $github->getUsername(),
+            'Access Token' => $github->getAccessToken()
         ]);
     }
 }
