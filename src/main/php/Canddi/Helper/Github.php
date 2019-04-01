@@ -25,7 +25,7 @@ class Canddi_Helper_Github
     $this->config = $modelHelperConfig;
   }
 
-  public function getConfig($modelHelperConfig) {
+  public function getConfig() {
     return $this->config;
   }
 
