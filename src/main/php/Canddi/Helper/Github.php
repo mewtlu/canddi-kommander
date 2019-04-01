@@ -11,8 +11,8 @@ class Canddi_Helper_Github
     $modelHelperConfig = \Canddi_Helper_Config::getInstance();
     $this->setConfig($modelHelperConfig);
 
-    $this->setUsername($this->config->getGithubUsername());
-    $this->setAccessToken($this->config->getGithubPAT());
+    $this->setUsername($this->getConfig()->getGithubUsername());
+    $this->setAccessToken($this->getConfig()->getGithubPAT());
     $this->setOrganisation($this->getConfig()->getOrganisation());
 
     $this->guzzleConnection = \Canddi_GuzzleFactory::build(
