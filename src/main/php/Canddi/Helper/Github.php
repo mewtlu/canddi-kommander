@@ -57,4 +57,8 @@ class Canddi_Helper_Github
      *  $this->setBranchProtection($strRepository, self::PROTECTION_RULES);
      **/
   }
+
+  public function updateRepository($strRepository) {
+    $this->updateSettings($strRepository);
+  }
 }
