@@ -1,13 +1,17 @@
 <?php
 /**
  * Helper for Github update functions
- */
+ **/
+use GuzzleHttp\Exception\RequestException;
+
 class Canddi_Helper_Github
 {
   use Canddi_Interface_Singleton;
 
-  private function __construct (
+  const GITHUB_ROOT_URL = 'https://api.github.com/';
   ) {
+
+  private function __construct () {
     $modelHelperConfig = \Canddi_Helper_Config::getInstance();
     $this->setConfig($modelHelperConfig);
 
@@ -54,10 +58,38 @@ class Canddi_Helper_Github
   }
   }
 
+  /**
+   * createNewRepository
+   * @param  [string] $strRepository - Name of repository to create
+   * @return [array] If successful returns array of repository data, else error
+   */
   private function createNewRepository($strRepository) {
-    /**
-     * In here we'll make the call to create a new repo of name $strRepository
-     **/
+    $strOrganisation = $this->getOrganisation();
+
+    try {
+      $response = $this->callApi(
+        'POST',
+        "orgs/$strOrganisation/repos",
+        [
+          'name' => $strRepository
+        ]
+      );
+
+      if ($response->getStatusCode() === 201) {
+        return JSON_encode($response->getBody());
+      } else {
+        echo "Unknown error:", var_export($response);
+      }
+    } catch (RequestException $exception) {
+      /* For some reason the call failed, return the error */
+      $response = $exception->getResponse();
+      return [
+        'code' => $response->getStatusCode(),
+        'phrase' => $response->getReasonPhrase(),
+        'response' => JSON_decode($response->getBody())
+      ];
+    }
+
   }
 
   private function updateSettings($strRepository) {
@@ -71,9 +103,13 @@ class Canddi_Helper_Github
   }
 
   public function createRepository($strRepository) {
-    $this->createNewRepository($strRepository);
+    $arrRepositoryInfo = $this->createNewRepository($strRepository);
 
     $this->updateSettings($strRepository);
+
+    return [
+      'repository_info' => $arrRepositoryInfo,
+    ];
   }
 
   public function updateRepository($strRepository) {
