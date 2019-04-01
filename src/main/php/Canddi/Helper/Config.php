@@ -92,8 +92,8 @@ class Canddi_Helper_Config
     public function getOrganisation()
     {
         return $this->_getValue(
-            ["ORGANISATION"],
-            "ORGANISATION"
+            ["GITHUB_ORGANISATION"],
+            "GITHUB_ORGANISATION"
         );
     }
 }
