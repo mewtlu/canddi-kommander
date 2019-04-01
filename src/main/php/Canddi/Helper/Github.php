@@ -48,6 +48,13 @@ class Canddi_Helper_Github
   public function getOrganisation() {
     return $this->access_token;
   }
+
+  private function createNewRepository($strRepository) {
+    /**
+     * In here we'll make the call to create a new repo of name $strRepository
+     **/
+  }
+
   private function updateSettings($strRepository) {
     /**
      * In here we'll run:
@@ -56,6 +63,12 @@ class Canddi_Helper_Github
      *  $this->setCodeOwners($strRepository, self::CODEOWNERS);
      *  $this->setBranchProtection($strRepository, self::PROTECTION_RULES);
      **/
+  }
+
+  public function createRepository($strRepository) {
+    $this->createNewRepository($strRepository);
+
+    $this->updateSettings($strRepository);
   }
 
   public function updateRepository($strRepository) {
