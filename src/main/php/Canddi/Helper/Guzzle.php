@@ -1,5 +1,8 @@
 <?php
 
+use GuzzleHttp\Client;
+use GuzzleHttp\Exception\RequestException;
+
 class Canddi_GuzzleFactory
 {
   protected static $_guzzleConnection = null;
