@@ -14,6 +14,11 @@ class Canddi_Helper_Github
     $this->setUsername($this->config->getGithubUsername());
     $this->setAccessToken($this->config->getGithubPAT());
     $this->setOrganisation($this->getConfig()->getOrganisation());
+
+    $this->guzzleConnection = \Canddi_GuzzleFactory::build(
+      self::GITHUB_ROOT_URL,
+      $this->getAccessToken()
+    );
   }
 
   public function setConfig($modelHelperConfig) {
