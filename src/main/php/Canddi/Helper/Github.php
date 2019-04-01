@@ -13,6 +13,7 @@ class Canddi_Helper_Github
 
     $this->setUsername($this->config->getGithubUsername());
     $this->setAccessToken($this->config->getGithubPAT());
+    $this->setOrganisation($this->getConfig()->getOrganisation());
   }
 
   public function setConfig($modelHelperConfig) {
@@ -32,6 +33,14 @@ class Canddi_Helper_Github
   }
 
   public function getAccessToken() {
+    return $this->access_token;
+  }
+
+  public function setOrganisation($strOrganisation) {
+    $this->access_token = $strOrganisation;
+  }
+
+  public function getOrganisation() {
     return $this->access_token;
   }
 }

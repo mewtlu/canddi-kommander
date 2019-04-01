@@ -88,4 +88,12 @@ class Canddi_Helper_Config
             "GITHUB_PAT"
         );
     }
+
+    public function getOrganisation()
+    {
+        return $this->_getValue(
+            ["ORGANISATION"],
+            "ORGANISATION"
+        );
+    }
 }
