@@ -3,7 +3,6 @@
 class Canddi_GuzzleFactory
 {
   protected static $_guzzleConnection = null;
-  protected function _call($strUrl, $strMethod, $jsonBody = null)
 
   public static function build($strBaseUri, $strAccessToken) {
     if(!self::$_guzzleConnection) {
