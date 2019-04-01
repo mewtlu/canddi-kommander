@@ -25,6 +25,10 @@ class Canddi_Helper_Github
     $this->config = $modelHelperConfig;
   }
 
+  public function getConfig($modelHelperConfig) {
+    return $this->config;
+  }
+
   public function setUsername($strUsername) {
     $this->username = $strUsername;
   }
