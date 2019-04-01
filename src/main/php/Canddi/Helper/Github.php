@@ -48,4 +48,13 @@ class Canddi_Helper_Github
   public function getOrganisation() {
     return $this->access_token;
   }
+  private function updateSettings($strRepository) {
+    /**
+     * In here we'll run:
+     *  $this->createBranch($strRepository, self::DEFAULT_BRANCH);
+     *  $this->setDefaultBranch($strRepository, self::DEFAULT_BRANCH);
+     *  $this->setCodeOwners($strRepository, self::CODEOWNERS);
+     *  $this->setBranchProtection($strRepository, self::PROTECTION_RULES);
+     **/
+  }
 }
