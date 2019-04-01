@@ -46,11 +46,12 @@ class Canddi_Helper_Github
   }
 
   public function setOrganisation($strOrganisation) {
-    $this->access_token = $strOrganisation;
+    $this->organisation = $strOrganisation;
   }
 
   public function getOrganisation() {
-    return $this->access_token;
+    return $this->organisation;
+  }
   }
 
   private function createNewRepository($strRepository) {
