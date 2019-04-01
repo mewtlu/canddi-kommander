@@ -42,13 +42,9 @@ extends Cli_Abstract
             throw new Canddi_Exception_Fatal_ValueCantBeNull('repository');
         }
 
-        $github->createRepository($strRepo);
+        $response = $github->createRepository($strRepo);
 
-        $this->view->assign([
-            'Repository' => "$strRepo",
-            'Username' => $github->getUsername(),
-            'Access Token' => $github->getAccessToken()
-        ]);
+        $this->view->assign($response);
     }
 
     /**
