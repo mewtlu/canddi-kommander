@@ -10,15 +10,11 @@ class Canddi_GuzzleFactory
   public static function build($strBaseUri, $strAccessToken) {
     if(!self::$_guzzleConnection) {
       $arrDefaults = [
-          'base_uri'            => $strBaseUri,
-          'connect_timeout'     => 5,
-          'timeout'             => 5,
-          'headers'             => [
-              'Accept'          => 'application/json',
-              'Accept-Encoding' => 'gzip, deflate',
-              'Authorization'   => "token $strAccessToken"
-          ],
-          'verify'              => false
+        'headers' => [
+          'Authorization' => "token $strAccessToken",
+          'Content-Type' => 'application/json',
+          'Accept' => 'application/json'
+        ]
       ];
 
       return self::$_guzzleConnection = new Client($arrDefaults);
