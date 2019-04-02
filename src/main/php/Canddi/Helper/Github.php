@@ -56,6 +56,15 @@ class Canddi_Helper_Github
   public function getOrganisation() {
     return $this->organisation;
   }
+
+  private function callApi($strMethod, $strEndpoint, $arrBody = []) {
+    return $this->guzzleConnection->request(
+      $strMethod,
+      self::GITHUB_ROOT_URL . "$strEndpoint",
+      [
+        'json' => $arrBody
+      ]
+    );
   }
 
   /**
