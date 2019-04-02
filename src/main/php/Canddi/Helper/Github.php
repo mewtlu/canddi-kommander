@@ -25,38 +25,6 @@ class Canddi_Helper_Github
     );
   }
 
-  public function setConfig($modelHelperConfig) {
-    $this->config = $modelHelperConfig;
-  }
-
-  public function getConfig() {
-    return $this->config;
-  }
-
-  public function setUsername($strUsername) {
-    $this->username = $strUsername;
-  }
-
-  public function getUsername() {
-    return $this->username;
-  }
-
-  public function setAccessToken($strAccessToken) {
-    $this->access_token = $strAccessToken;
-  }
-
-  public function getAccessToken() {
-    return $this->access_token;
-  }
-
-  public function setOrganisation($strOrganisation) {
-    $this->organisation = $strOrganisation;
-  }
-
-  public function getOrganisation() {
-    return $this->organisation;
-  }
-
   private function callApi($strMethod, $strEndpoint, $arrBody = []) {
     return $this->guzzleConnection->request(
       $strMethod,
@@ -98,17 +66,6 @@ class Canddi_Helper_Github
         'response' => JSON_decode($response->getBody())
       ];
     }
-
-  }
-
-  private function updateSettings($strRepository) {
-    /**
-     * In here we'll run:
-     *  $this->createBranch($strRepository, self::DEFAULT_BRANCH);
-     *  $this->setDefaultBranch($strRepository, self::DEFAULT_BRANCH);
-     *  $this->setCodeOwners($strRepository, self::CODEOWNERS);
-     *  $this->setBranchProtection($strRepository, self::PROTECTION_RULES);
-     **/
   }
 
   public function createRepository($strRepository) {
@@ -121,7 +78,49 @@ class Canddi_Helper_Github
     ];
   }
 
+  public function getConfig() {
+    return $this->config;
+  }
+
+  public function getUsername() {
+    return $this->username;
+  }
+
+  public function getAccessToken() {
+    return $this->access_token;
+  }
+
+  public function getOrganisation() {
+    return $this->organisation;
+  }
+
+  public function setConfig($modelHelperConfig) {
+    $this->config = $modelHelperConfig;
+  }
+
+  public function setUsername($strUsername) {
+    $this->username = $strUsername;
+  }
+
+  public function setAccessToken($strAccessToken) {
+    $this->access_token = $strAccessToken;
+  }
+
+  public function setOrganisation($strOrganisation) {
+    $this->organisation = $strOrganisation;
+  }
+
   public function updateRepository($strRepository) {
     $this->updateSettings($strRepository);
+  }
+
+  private function updateSettings($strRepository) {
+    /**
+     * In here we'll run:
+     *  $this->createBranch($strRepository, self::DEFAULT_BRANCH);
+     *  $this->setDefaultBranch($strRepository, self::DEFAULT_BRANCH);
+     *  $this->setCodeOwners($strRepository, self::CODEOWNERS);
+     *  $this->setBranchProtection($strRepository, self::PROTECTION_RULES);
+     **/
   }
 }
