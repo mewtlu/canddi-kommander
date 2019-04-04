@@ -9,6 +9,7 @@ class Canddi_Helper_Github
   use Canddi_Interface_Singleton;
 
   const GITHUB_ROOT_URL = 'https://api.github.com/';
+  const GITHUB_CODEOWNERS_COMMITMSG = 'Create codeowners file';
 
   private function __construct () {
     $modelHelperConfig = \Canddi_Helper_Config::getInstance();
@@ -37,12 +38,22 @@ class Canddi_Helper_Github
 
   private function createCodeOwners($strRepository)
   {
-    /*
-      PUT /repos/:owner/:repo/contents/.github/CODEOWNERS
-    */
-    $strCommitMessage = 'Create codeowners file';
+    $strOrganisation = $this->getOrganisation();
     $strContent = $this->getCodeowners();
     $b64Content = base64_encode($strContent);
+
+    /* Note: will throw an error if the file already exists, we need to check
+        if it does first and if so pass this the sha. */
+    $commitResponse = $this->callApi(
+      'PUT',
+      "repos/$strOrganisation/$strRepository/contents/.github/CODEOWNERS",
+      [
+        "message" => self::GITHUB_CODEOWNERS_COMMITMSG,
+        "content" => $b64Content,
+      ]
+    );
+
+    return $commitResponse;
   }
 
   /**
