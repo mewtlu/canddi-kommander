@@ -9,7 +9,6 @@ class Canddi_Helper_Github
   use Canddi_Interface_Singleton;
 
   const GITHUB_ROOT_URL = 'https://api.github.com/';
-  ) {
 
   private function __construct () {
     $modelHelperConfig = \Canddi_Helper_Config::getInstance();
