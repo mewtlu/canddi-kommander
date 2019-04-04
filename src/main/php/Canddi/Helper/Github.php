@@ -3,6 +3,7 @@
  * Helper for Github update functions
  **/
 use GuzzleHttp\Exception\RequestException;
+use GuzzleHttp\Exception\ClientException;
 
 class Canddi_Helper_Github
 {
@@ -23,6 +24,38 @@ class Canddi_Helper_Github
       self::GITHUB_ROOT_URL,
       $this->getAccessToken()
     );
+  }
+
+  public function setConfig($modelHelperConfig) {
+    $this->config = $modelHelperConfig;
+  }
+
+  public function getConfig() {
+    return $this->config;
+  }
+
+  public function setUsername($strUsername) {
+    $this->username = $strUsername;
+  }
+
+  public function getUsername() {
+    return $this->username;
+  }
+
+  public function setAccessToken($strAccessToken) {
+    $this->access_token = $strAccessToken;
+  }
+
+  public function getAccessToken() {
+    return $this->access_token;
+  }
+
+  public function setOrganisation($strOrganisation) {
+    $this->organisation = $strOrganisation;
+  }
+
+  public function getOrganisation() {
+    return $this->organisation;
   }
 
   private function callApi($strMethod, $strEndpoint, $arrBody = []) {
@@ -68,59 +101,96 @@ class Canddi_Helper_Github
     }
   }
 
-  public function createRepository($strRepository) {
-    $arrRepositoryInfo = $this->createNewRepository($strRepository);
+  /**
+   * If doesn't exist, create a branch (this is usually develop)
+   * @param  [str] $strRepository - Name of repository
+   * @param  [str] $strBranchName - Name of branch to create
+   * @return void
+   */
+  private function createBranch($strRepository, $strBranchName) {
+    $strOrganisation = $this->getOrganisation();
+    $strCommitHash = '';
 
-    $this->updateSettings($strRepository);
+    try {
+      $this->callApi(
+        'GET',
+        "repos/$strOrganisation/$strRepository/branches/$strBranchName"
+      );
+      // if this doesn't error, the branch exists, so we can exit.
+      return true;
+    } catch (ClientException $exception) {
+      // do nothing here, just continue
+    }
 
+    // get the hash
+    try {
+      $getHashResponse = $this->callApi(
+        'GET',
+        "repos/$strOrganisation/$strRepository/git/refs/heads"
+      );
+    } catch (ClientException $exception) {
+      $response = $exception->getResponse();
+      return [
+        'code' => $response->getStatusCode(),
+        'phrase' => $response->getReasonPhrase(),
+        'response' => JSON_decode($response->getBody())
+      ];
+    }
+
+    // create the branch
+    try {
+      $getHashResponse = $this->callApi(
+        'POST',
+        "self::GITHUB_ROOT_URL/repos/$strOrganisation/$strRepository/git/refs",
+        [
+          "ref" => "refs/heads/$strBranchName",
+          "sha" => "$strCommitHash"
+        ]
+      );
+    } catch (ClientException $exception) {
+      $response = $exception->getResponse();
+      return [
+        'code' => $response->getStatusCode(),
+        'phrase' => $response->getReasonPhrase(),
+        'response' => JSON_decode($response->getBody())
+      ];
+    }
+  }
+
+  /**
+   * Updates a repository's settings to match the required settings
+   * @param  [string] $strRepository - Name of the repository
+   * @return [array] associative array containing responses from
+   *                  each settings function
+   */
+  private function updateSettings($strRepository) {
+    $createBranchResponse = $this->createBranch($strRepository, self::DEFAULT_BRANCH);
+    /**
+     * In here we'll run:
+     *  $this->setCodeOwners($strRepository, self::CODEOWNERS);
+     *  $this->createBranch($strRepository, self::DEFAULT_BRANCH);
+     *  $this->setDefaultBranch($strRepository, self::DEFAULT_BRANCH);
+     *  $this->setBranchProtection($strRepository, self::PROTECTION_RULES);
+     *
+     * Note: setCodeOwners MUST be ran before createBranch as createBranch
+     *  depends on the repo not being empty and setCodeOwners ensures this
+     **/
     return [
-      'repository_info' => $arrRepositoryInfo,
+      'createBranch' => $createBranchResponse
     ];
   }
 
-  public function getConfig() {
-    return $this->config;
-  }
+  public function createRepository($strRepository) {
+    $arrRepositoryInfo = $this->createNewRepository($strRepository);
+    $arrRepositorySettings = $this->updateSettings($strRepository);
 
-  public function getUsername() {
-    return $this->username;
-  }
-
-  public function getAccessToken() {
-    return $this->access_token;
-  }
-
-  public function getOrganisation() {
-    return $this->organisation;
-  }
-
-  public function setConfig($modelHelperConfig) {
-    $this->config = $modelHelperConfig;
-  }
-
-  public function setUsername($strUsername) {
-    $this->username = $strUsername;
-  }
-
-  public function setAccessToken($strAccessToken) {
-    $this->access_token = $strAccessToken;
-  }
-
-  public function setOrganisation($strOrganisation) {
-    $this->organisation = $strOrganisation;
+    return [
+      'repository_info' => $arrRepositoryInfo,
+      'repository_settings' => $arrRepositorySettings
+    ];
   }
 
   public function updateRepository($strRepository) {
     $this->updateSettings($strRepository);
-  }
-
-  private function updateSettings($strRepository) {
-    /**
-     * In here we'll run:
-     *  $this->createBranch($strRepository, self::DEFAULT_BRANCH);
-     *  $this->setDefaultBranch($strRepository, self::DEFAULT_BRANCH);
-     *  $this->setCodeOwners($strRepository, self::CODEOWNERS);
-     *  $this->setBranchProtection($strRepository, self::PROTECTION_RULES);
-     **/
   }
 }
