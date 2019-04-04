@@ -17,6 +17,7 @@ class Canddi_Helper_Github
     $this->setUsername($this->getConfig()->getGithubUsername());
     $this->setAccessToken($this->getConfig()->getGithubPAT());
     $this->setOrganisation($this->getConfig()->getOrganisation());
+    $this->setCodeOwners($this->getConfig()->getCodeowners());
 
     $this->guzzleConnection = \Canddi_GuzzleFactory::build(
       self::GITHUB_ROOT_URL,
@@ -77,6 +78,10 @@ class Canddi_Helper_Github
     ];
   }
 
+  public function getCodeowners() {
+    return $this->codeowners;
+  }
+
   public function getConfig() {
     return $this->config;
   }
@@ -91,6 +96,10 @@ class Canddi_Helper_Github
 
   public function getOrganisation() {
     return $this->organisation;
+  }
+
+  public function setCodeOwners($strCodeowners) {
+    $this->codeowners = $strCodeowners;
   }
 
   public function setConfig($modelHelperConfig) {
