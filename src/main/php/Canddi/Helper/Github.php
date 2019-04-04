@@ -35,6 +35,16 @@ class Canddi_Helper_Github
     );
   }
 
+  private function createCodeOwners($strRepository)
+  {
+    /*
+      PUT /repos/:owner/:repo/contents/.github/CODEOWNERS
+    */
+    $strCommitMessage = 'Create codeowners file';
+    $strContent = $this->getCodeowners();
+    $b64Content = base64_encode($strContent);
+  }
+
   /**
    * createNewRepository
    * @param  [string] $strRepository - Name of repository to create
@@ -123,11 +133,11 @@ class Canddi_Helper_Github
   }
 
   private function updateSettings($strRepository) {
+    $this->createCodeOwners($strRepository);
     /**
      * In here we'll run:
      *  $this->createBranch($strRepository, self::DEFAULT_BRANCH);
      *  $this->setDefaultBranch($strRepository, self::DEFAULT_BRANCH);
-     *  $this->setCodeOwners($strRepository, self::CODEOWNERS);
      *  $this->setBranchProtection($strRepository, self::PROTECTION_RULES);
      **/
   }
