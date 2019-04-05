@@ -121,15 +121,16 @@ class Canddi_Helper_Github
       'POST',
       "orgs/$strOrganisation/repos",
       [
-        'name' => $strRepository
+        'name' => $strRepository,
+        'private' => true,
       ]
     );
 
-    if ($response->getStatusCode() === 201) {
-      return JSON_encode($response->getBody());
-    } else {
-      echo "Unknown error:", var_export($response);
-    }
+    return [
+      'id' => $response['id'],
+      'name' => $response['name'],
+      'private' => $response['private'],
+    ];
   }
 
   public function createRepository($strRepository) {
