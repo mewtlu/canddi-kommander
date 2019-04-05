@@ -4,8 +4,6 @@
  **/
 
 use Canddi\Kommander\Exception\Fatal\ResponseException;
-use GuzzleHttp\Exception\RequestException;
-use GuzzleHttp\Exception\ClientException;
 
 class Canddi_Helper_Github
 {
