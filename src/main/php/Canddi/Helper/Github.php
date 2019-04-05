@@ -153,6 +153,19 @@ class Canddi_Helper_Github
     return true;
   }
 
+  private function createBranchProtection($strRepository, $arrRules) {
+    $strOrganisation = $this->getOrganisation();
+
+    foreach ($arrRules as $strBranchName) {
+        $defaultBranchResponse = $this->callApi(
+          'PUT',
+          "repos/$strOrganisation/$strRepository/branches/$strBranchName/protection",
+          $arrRules[$strBranchName]
+        );
+    }
+
+    return true;
+  }
   private function createDefaultBranch($strRepository, $strBranchName)
   {
     $strOrganisation = $this->getOrganisation();
