@@ -9,6 +9,8 @@ class Canddi_Helper_Config
 {
     use Canddi_Interface_Singleton;
 
+    const GITHUB_CODEOWNERS_FILEPATH = 'static/CODEOWNERS';
+
     /**
      * This constructs the actual helper
      *
@@ -95,5 +97,17 @@ class Canddi_Helper_Config
             ["GITHUB_ORGANISATION"],
             "GITHUB_ORGANISATION"
         );
+    }
+
+    public function getCodeowners()
+    {
+        if (file_exists(self::GITHUB_CODEOWNERS_FILEPATH)) {
+            $streamCodeownersFile = fopen(self::GITHUB_CODEOWNERS_FILEPATH, 'r');
+            return fread($streamCodeownersFile, filesize(self::GITHUB_CODEOWNERS_FILEPATH));
+        } else {
+            throw new Canddi_Helper_Config_Exception_FileDoesNotExist(
+                self::GITHUB_CODEOWNERS_FILEPATH
+            );
+        }
     }
 }
