@@ -106,6 +106,11 @@ class Canddi_Helper_Github
     return true;
   }
 
+  private function createDefaultBranch($strRepository, $strBranchName)
+  {
+    return true;
+  }
+
   private function createCodeOwners($strRepository)
   {
     $strOrganisation = $this->getOrganisation();
@@ -238,6 +243,7 @@ class Canddi_Helper_Github
     return [
         "codeOwners" => $this->createCodeOwners($strRepository),
         "createBranch" => $this->createBranch($strRepository, self::DEFAULT_BRANCH),
+        "defaultBranch" => $this->createDefaultBranch($strRepository, self::DEFAULT_BRANCH),
         // "branchProtection" => $this->setBranchProtection($strRepository, self::PROTECTION_RULES),
     ];
   }
