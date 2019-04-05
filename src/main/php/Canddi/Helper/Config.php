@@ -101,13 +101,13 @@ class Canddi_Helper_Config
 
     public function getCodeowners()
     {
-        if (file_exists(self::GITHUB_CODEOWNERS_FILEPATH)) {
-            $streamCodeownersFile = fopen(self::GITHUB_CODEOWNERS_FILEPATH, 'r');
-            return fread($streamCodeownersFile, filesize(self::GITHUB_CODEOWNERS_FILEPATH));
-        } else {
+        if (! file_exists(self::GITHUB_CODEOWNERS_FILEPATH)) {
             throw new Canddi_Helper_Config_Exception_FileDoesNotExist(
                 self::GITHUB_CODEOWNERS_FILEPATH
             );
         }
+        $streamCodeownersFile = fopen(self::GITHUB_CODEOWNERS_FILEPATH, 'r');
+
+        return fread($streamCodeownersFile, filesize(self::GITHUB_CODEOWNERS_FILEPATH)
     }
 }
