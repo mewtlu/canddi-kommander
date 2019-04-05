@@ -5,6 +5,9 @@
 
 use Canddi\Kommander\Exception\Fatal\ResponseException;
 
+use GuzzleHttp\Exception\ClientException;
+use GuzzleHttp\Exception\RequestException;
+
 class Canddi_Helper_Github
 {
   use Canddi_Interface_Singleton;
