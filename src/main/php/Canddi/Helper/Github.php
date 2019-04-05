@@ -73,8 +73,30 @@ class Canddi_Helper_Github
     $strContent = $this->getCodeowners();
     $b64Content = base64_encode($strContent);
 
-    /* Note: will throw an error if the file already exists, we need to check
-        if it does first and if so pass this the sha. */
+    /* This code is pretty confusing, maybe could do with refactoring? */
+    try {
+      /* If a 404 is returned from this GET we don't need to pass the SHA. */
+      $getFileResponse = $this->callApi(
+        'GET',
+        "repos/$strOrganisation/$strRepository/contents/.github/CODEOWNERS"
+      );
+
+      $commitResponse = $this->callApi(
+        'PUT',
+        "repos/$strOrganisation/$strRepository/contents/.github/CODEOWNERS",
+        [
+          "message" => self::GITHUB_CODEOWNERS_COMMITMSG,
+          "content" => $b64Content,
+          "sha" => $getFileResponse["sha"],
+        ]
+      );
+
+      return true;
+    } catch (ResponseException $exception) {
+      /* Fallthrough to the request below: */
+    }
+
+    /* If for some reason the PUT failed with sha, let's try without */
     $commitResponse = $this->callApi(
       'PUT',
       "repos/$strOrganisation/$strRepository/contents/.github/CODEOWNERS",
