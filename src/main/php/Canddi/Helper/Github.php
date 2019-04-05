@@ -13,6 +13,7 @@ class Canddi_Helper_Github
 
   const GITHUB_ROOT_URL = 'https://api.github.com/';
   const GITHUB_CODEOWNERS_COMMITMSG = 'Create codeowners file';
+  const DEFAULT_BRANCH = 'develop';
 
   private function __construct () {
     $modelHelperConfig = \Canddi_Helper_Config::getInstance();
@@ -65,6 +66,46 @@ class Canddi_Helper_Github
     }
 
     return JSON_decode($response->getBody(), true);
+  }
+
+  /**
+   * If doesn't exist, create a branch (this is usually develop)
+   * @param  [str] $strRepository - Name of repository
+   * @param  [str] $strBranchName - Name of branch to create
+   * @return void
+   */
+  private function createBranch($strRepository, $strBranchName)
+  {
+    $strOrganisation = $this->getOrganisation();
+
+    try {
+      $this->callApi(
+        'GET',
+        "repos/$strOrganisation/$strRepository/branches/$strBranchName"
+      );
+      // if this doesn't error, the branch exists, so we can exit.
+      return true;
+    } catch (ResponseException $exception) {
+      // do nothing here, just continue
+    }
+
+    // get the hash
+    $getHashResponse = $this->callApi(
+      'GET',
+      "repos/$strOrganisation/$strRepository/git/refs/heads"
+    );
+
+    // create the branch
+    $createBranchResponse = $this->callApi(
+      'POST',
+      "repos/$strOrganisation/$strRepository/git/refs",
+      [
+        "ref" => "refs/heads/$strBranchName",
+        "sha" => $getHashResponse[0]['object']['sha']
+      ]
+    );
+
+    return true;
   }
 
   private function createCodeOwners($strRepository)
@@ -198,6 +239,7 @@ class Canddi_Helper_Github
   private function updateSettings($strRepository) {
     return [
       "codeOwners" => $this->createCodeOwners($strRepository),
+      "createBranch" => $this->createBranch($strRepository, self::DEFAULT_BRANCH),
     ];
     /**
      * In here we'll run:
