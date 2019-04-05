@@ -108,6 +108,6 @@ class Canddi_Helper_Config
         }
         $streamCodeownersFile = fopen(self::GITHUB_CODEOWNERS_FILEPATH, 'r');
 
-        return fread($streamCodeownersFile, filesize(self::GITHUB_CODEOWNERS_FILEPATH)
+        return fread($streamCodeownersFile, filesize(self::GITHUB_CODEOWNERS_FILEPATH));
     }
 }

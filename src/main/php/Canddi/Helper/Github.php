@@ -5,6 +5,9 @@
 
 use Canddi\Kommander\Exception\Fatal\ResponseException;
 
+use GuzzleHttp\Exception\ClientException;
+use GuzzleHttp\Exception\RequestException;
+
 class Canddi_Helper_Github
 {
   use Canddi_Interface_Singleton;
@@ -100,6 +103,22 @@ class Canddi_Helper_Github
       [
         "ref" => "refs/heads/$strBranchName",
         "sha" => $getHashResponse[0]['object']['sha']
+      ]
+    );
+
+    return true;
+  }
+
+  private function createDefaultBranch($strRepository, $strBranchName)
+  {
+    $strOrganisation = $this->getOrganisation();
+
+    $defaultBranchResponse = $this->callApi(
+      'PATCH',
+      "repos/$strOrganisation/$strRepository",
+      [
+        'name' => $strRepository,
+        'default_branch' => $strBranchName,
       ]
     );
 
@@ -236,18 +255,10 @@ class Canddi_Helper_Github
    */
   private function updateSettings($strRepository) {
     return [
-      "codeOwners" => $this->createCodeOwners($strRepository),
-      "createBranch" => $this->createBranch($strRepository, self::DEFAULT_BRANCH),
+        "codeOwners" => $this->createCodeOwners($strRepository),
+        "createBranch" => $this->createBranch($strRepository, self::DEFAULT_BRANCH),
+        "defaultBranch" => $this->createDefaultBranch($strRepository, self::DEFAULT_BRANCH),
+        // "branchProtection" => $this->setBranchProtection($strRepository, self::PROTECTION_RULES),
     ];
-    /**
-     * In here we'll run:
-     *  $this->setCodeOwners($strRepository, self::CODEOWNERS);
-     *  $this->createBranch($strRepository, self::DEFAULT_BRANCH);
-     *  $this->setDefaultBranch($strRepository, self::DEFAULT_BRANCH);
-     *  $this->setBranchProtection($strRepository, self::PROTECTION_RULES);
-     *
-     * Note: setCodeOwners MUST be ran before createBranch as createBranch
-     *  depends on the repo not being empty and setCodeOwners ensures this
-     **/
   }
 }
