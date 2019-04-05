@@ -84,7 +84,7 @@ class Canddi_Helper_Github
       ]
     );
 
-    return $commitResponse;
+    return true;
   }
 
   /**
@@ -161,11 +161,13 @@ class Canddi_Helper_Github
   }
 
   public function updateRepository($strRepository) {
-    $this->updateSettings($strRepository);
+    return $this->updateSettings($strRepository);
   }
 
   private function updateSettings($strRepository) {
-    $this->createCodeOwners($strRepository);
+    return [
+      "codeOwners" => $this->createCodeOwners($strRepository),
+    ];
     /**
      * In here we'll run:
      *  $this->createBranch($strRepository, self::DEFAULT_BRANCH);
