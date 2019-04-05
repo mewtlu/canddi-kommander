@@ -162,6 +162,10 @@ class Canddi_Helper_Github
     return $this->organisation;
   }
 
+  public function setAccessToken($strAccessToken) {
+    $this->access_token = $strAccessToken;
+  }
+
   public function setCodeOwners($strCodeowners) {
     $this->codeowners = $strCodeowners;
   }
@@ -170,35 +174,13 @@ class Canddi_Helper_Github
     $this->config = $modelHelperConfig;
   }
 
+  public function setOrganisation($strOrganisation) {
+    $this->organisation = $strOrganisation;
+  }
+
   public function setUsername($strUsername) {
     $this->username = $strUsername;
   }
-
-    try {
-      $this->callApi(
-        'GET',
-        "repos/$strOrganisation/$strRepository/branches/$strBranchName"
-      );
-      // if this doesn't error, the branch exists, so we can exit.
-      return true;
-    } catch (ClientException $exception) {
-      // do nothing here, just continue
-    }
-
-    // get the hash
-    try {
-      $getHashResponse = $this->callApi(
-        'GET',
-        "repos/$strOrganisation/$strRepository/git/refs/heads"
-      );
-    } catch (ClientException $exception) {
-      $response = $exception->getResponse();
-      return [
-        'code' => $response->getStatusCode(),
-        'phrase' => $response->getReasonPhrase(),
-        'response' => JSON_decode($response->getBody())
-      ];
-    }
 
   public function updateRepository($strRepository) {
     return $this->updateSettings($strRepository);
@@ -224,22 +206,5 @@ class Canddi_Helper_Github
      * Note: setCodeOwners MUST be ran before createBranch as createBranch
      *  depends on the repo not being empty and setCodeOwners ensures this
      **/
-    return [
-      'createBranch' => $createBranchResponse
-    ];
-  }
-
-  public function createRepository($strRepository) {
-    $arrRepositoryInfo = $this->createNewRepository($strRepository);
-    $arrRepositorySettings = $this->updateSettings($strRepository);
-
-    return [
-      'repository_info' => $arrRepositoryInfo,
-      'repository_settings' => $arrRepositorySettings
-    ];
-  }
-
-  public function updateRepository($strRepository) {
-    $this->updateSettings($strRepository);
   }
 }
