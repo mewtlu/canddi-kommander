@@ -15,6 +15,50 @@ class Canddi_Helper_Github
   const GITHUB_ROOT_URL = 'https://api.github.com/';
   const GITHUB_CODEOWNERS_COMMITMSG = 'Create codeowners file';
   const DEFAULT_BRANCH = 'develop';
+  const PROTECTION_RULES = [
+    'develop' => [
+        'required_status_checks' => [
+            'strict' => true,
+            'contexts' => [
+                'continuous-integration/travis-ci',
+                'WIP',
+            ]
+        ],
+        'enforce_admins' => true,
+        'required_pull_request_reviews' => [
+            'require_code_owner_reviews' => true,
+        ],
+        'restrictions' => [
+            'users' => [
+
+            ],
+            'teams' => [
+                'canmergetodev',
+            ],
+        ],
+    ],
+    'master' => [
+        'required_status_checks' => [
+            'strict' => true,
+            'contexts' => [
+                'continuous-integration/travis-ci',
+                'WIP',
+            ]
+        ],
+        'enforce_admins' => true,
+        'required_pull_request_reviews' => [
+            'require_code_owner_reviews' => true,
+        ],
+        'restrictions' => [
+            'users' => [
+                'timlangley',
+            ],
+            'teams' => [
+
+            ],
+        ],
+    ],
+  ];
 
   private function __construct () {
     $modelHelperConfig = \Canddi_Helper_Config::getInstance();
