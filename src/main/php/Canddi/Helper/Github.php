@@ -2,6 +2,9 @@
 /**
  * Helper for Github update functions
  **/
+
+use Canddi\Kommander\Exception\Fatal\ResponseException;
+
 use GuzzleHttp\Exception\RequestException;
 
 class Canddi_Helper_Github
@@ -26,14 +29,42 @@ class Canddi_Helper_Github
     );
   }
 
+  /**
+   * Makes a call to the Github API
+   * @param  [string] $strMethod   - HTTP request method to use
+   * @param  [string] $strEndpoint - The endpoint to make the request to
+   * @param  array  $arrBody       - An optional array of body parameters to
+   *                                  send with the request
+   * @return [array]               - Array of data about the response from the server
+   */
   private function callApi($strMethod, $strEndpoint, $arrBody = []) {
-    return $this->guzzleConnection->request(
-      $strMethod,
-      self::GITHUB_ROOT_URL . "$strEndpoint",
-      [
-        'json' => $arrBody
-      ]
-    );
+    try {
+      $response = $this->guzzleConnection->request(
+        $strMethod,
+        self::GITHUB_ROOT_URL . "$strEndpoint",
+        [
+          'json' => $arrBody,
+        ]
+      );
+    } catch (RequestException $exception) { // Network errors
+      $response = $exception->getResponse();
+      $body = JSON_decode($response->getBody(), true);
+      throw new ResponseException(
+        $response->getStatusCode(),
+        $body['message'],
+        isset($body['errors']) ? $body['errors'] : null
+      );
+    } catch (ClientException $exception) { // 400 level errors
+      $response = $exception->getResponse();
+      $body = JSON_decode($response->getBody(), true);
+      throw new ResponseException(
+        $response->getStatusCode(),
+        $body['message'],
+        $body['errors']
+      );
+    }
+
+    return JSON_decode($response->getBody(), true);
   }
 
   private function createCodeOwners($strRepository)
@@ -64,28 +95,18 @@ class Canddi_Helper_Github
   private function createNewRepository($strRepository) {
     $strOrganisation = $this->getOrganisation();
 
-    try {
-      $response = $this->callApi(
-        'POST',
-        "orgs/$strOrganisation/repos",
-        [
-          'name' => $strRepository
-        ]
-      );
+    $response = $this->callApi(
+      'POST',
+      "orgs/$strOrganisation/repos",
+      [
+        'name' => $strRepository
+      ]
+    );
 
-      if ($response->getStatusCode() === 201) {
-        return JSON_encode($response->getBody());
-      } else {
-        echo "Unknown error:", var_export($response);
-      }
-    } catch (RequestException $exception) {
-      /* For some reason the call failed, return the error */
-      $response = $exception->getResponse();
-      return [
-        'code' => $response->getStatusCode(),
-        'phrase' => $response->getReasonPhrase(),
-        'response' => JSON_decode($response->getBody())
-      ];
+    if ($response->getStatusCode() === 201) {
+      return JSON_encode($response->getBody());
+    } else {
+      echo "Unknown error:", var_export($response);
     }
   }
 
