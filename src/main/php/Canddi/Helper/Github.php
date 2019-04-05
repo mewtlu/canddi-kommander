@@ -135,11 +135,11 @@ class Canddi_Helper_Github
 
   public function createRepository($strRepository) {
     $arrRepositoryInfo = $this->createNewRepository($strRepository);
-
-    $this->updateSettings($strRepository);
+    $arrRepositorySettings = $this->updateSettings($strRepository);
 
     return [
-      'repository_info' => $arrRepositoryInfo,
+      'details' => $arrRepositoryInfo,
+      'settings' => $arrRepositorySettings
     ];
   }
 
@@ -184,7 +184,9 @@ class Canddi_Helper_Github
   }
 
   public function updateRepository($strRepository) {
-    return $this->updateSettings($strRepository);
+    return [
+      'settings' => $this->updateSettings($strRepository)
+    ];
   }
 
   /**
