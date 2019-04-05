@@ -236,18 +236,9 @@ class Canddi_Helper_Github
    */
   private function updateSettings($strRepository) {
     return [
-      "codeOwners" => $this->createCodeOwners($strRepository),
-      "createBranch" => $this->createBranch($strRepository, self::DEFAULT_BRANCH),
+        "codeOwners" => $this->createCodeOwners($strRepository),
+        "createBranch" => $this->createBranch($strRepository, self::DEFAULT_BRANCH),
+        // "branchProtection" => $this->setBranchProtection($strRepository, self::PROTECTION_RULES),
     ];
-    /**
-     * In here we'll run:
-     *  $this->setCodeOwners($strRepository, self::CODEOWNERS);
-     *  $this->createBranch($strRepository, self::DEFAULT_BRANCH);
-     *  $this->setDefaultBranch($strRepository, self::DEFAULT_BRANCH);
-     *  $this->setBranchProtection($strRepository, self::PROTECTION_RULES);
-     *
-     * Note: setCodeOwners MUST be ran before createBranch as createBranch
-     *  depends on the repo not being empty and setCodeOwners ensures this
-     **/
   }
 }
