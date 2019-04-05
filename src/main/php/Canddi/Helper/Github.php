@@ -111,6 +111,17 @@ class Canddi_Helper_Github
 
   private function createDefaultBranch($strRepository, $strBranchName)
   {
+    $strOrganisation = $this->getOrganisation();
+
+    $defaultBranchResponse = $this->callApi(
+      'PATCH',
+      "repos/$strOrganisation/$strRepository",
+      [
+        'name' => $strRepository,
+        'default_branch' => $strBranchName,
+      ]
+    );
+
     return true;
   }
 
