@@ -313,6 +313,8 @@ class Canddi_Helper_Github
   }
 
   public function updateRepository($strRepository) {
+    $this->disableBranchProtection($strRepository, self::PROTECTION_RULES);
+
     return [
       'settings' => $this->updateSettings($strRepository)
     ];
