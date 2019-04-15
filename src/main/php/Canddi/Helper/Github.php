@@ -12,6 +12,7 @@ class Canddi_Helper_Github
 {
   use Canddi_Interface_Singleton;
 
+  const TEAM_MERGETODEV = 'canmergetodev';
   const GITHUB_ROOT_URL = 'https://api.github.com/';
   const GITHUB_CODEOWNERS_COMMITMSG = 'Create codeowners file';
   const DEFAULT_BRANCH = 'develop';
@@ -33,7 +34,7 @@ class Canddi_Helper_Github
 
             ],
             'teams' => [
-                'canmergetodev',
+                self::TEAM_MERGETODEV,
             ],
         ],
     ],
