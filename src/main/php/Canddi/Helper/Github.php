@@ -15,6 +15,50 @@ class Canddi_Helper_Github
   const GITHUB_ROOT_URL = 'https://api.github.com/';
   const GITHUB_CODEOWNERS_COMMITMSG = 'Create codeowners file';
   const DEFAULT_BRANCH = 'develop';
+  const PROTECTION_RULES = [
+    'develop' => [
+        'required_status_checks' => [
+            'strict' => true,
+            'contexts' => [
+                'continuous-integration/travis-ci',
+                'WIP',
+            ]
+        ],
+        'enforce_admins' => true,
+        'required_pull_request_reviews' => [
+            'require_code_owner_reviews' => true,
+        ],
+        'restrictions' => [
+            'users' => [
+
+            ],
+            'teams' => [
+                'canmergetodev',
+            ],
+        ],
+    ],
+    'master' => [
+        'required_status_checks' => [
+            'strict' => true,
+            'contexts' => [
+                'continuous-integration/travis-ci',
+                'WIP',
+            ]
+        ],
+        'enforce_admins' => true,
+        'required_pull_request_reviews' => [
+            'require_code_owner_reviews' => true,
+        ],
+        'restrictions' => [
+            'users' => [
+                'timlangley',
+            ],
+            'teams' => [
+
+            ],
+        ],
+    ],
+  ];
 
   private function __construct () {
     $modelHelperConfig = \Canddi_Helper_Config::getInstance();
@@ -105,6 +149,20 @@ class Canddi_Helper_Github
         "sha" => $getHashResponse[0]['object']['sha']
       ]
     );
+
+    return true;
+  }
+
+  private function createBranchProtection($strRepository, $arrRules) {
+    $strOrganisation = $this->getOrganisation();
+
+    foreach ($arrRules as $strBranchName => $arrBranchRules) {
+        $defaultBranchResponse = $this->callApi(
+          'PUT',
+          "repos/$strOrganisation/$strRepository/branches/$strBranchName/protection",
+          $arrBranchRules
+        );
+    }
 
     return true;
   }
@@ -201,6 +259,19 @@ class Canddi_Helper_Github
     ];
   }
 
+    private function disableBranchProtection($strRepository, $arrRules) {
+        $strOrganisation = $this->getOrganisation();
+
+        foreach ($arrRules as $strBranchName => $arrBranchRules) {
+            $defaultBranchResponse = $this->callApi(
+                'DELETE',
+                "repos/$strOrganisation/$strRepository/branches/$strBranchName/protection"
+            );
+        }
+
+        return true;
+    }
+
   public function getCodeowners() {
     return $this->codeowners;
   }
@@ -242,6 +313,8 @@ class Canddi_Helper_Github
   }
 
   public function updateRepository($strRepository) {
+    $this->disableBranchProtection($strRepository, self::PROTECTION_RULES);
+
     return [
       'settings' => $this->updateSettings($strRepository)
     ];
@@ -258,7 +331,7 @@ class Canddi_Helper_Github
         "codeOwners" => $this->createCodeOwners($strRepository),
         "createBranch" => $this->createBranch($strRepository, self::DEFAULT_BRANCH),
         "defaultBranch" => $this->createDefaultBranch($strRepository, self::DEFAULT_BRANCH),
-        // "branchProtection" => $this->setBranchProtection($strRepository, self::PROTECTION_RULES),
+        "branchProtection" => $this->createBranchProtection($strRepository, self::PROTECTION_RULES),
     ];
   }
 }
