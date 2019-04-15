@@ -75,6 +75,27 @@ class Canddi_Helper_Github
     );
   }
 
+  private function addTeamRepo($strRepository, $strTeamName) {
+    $strOrganisation = $this->getOrganisation();
+
+    $teamResponse = $this->callApi(
+        'GET',
+        "orgs/$strOrganisation/teams/$strTeamName"
+    );
+
+    $strTeamId = $teamResponse['id'];
+
+    $addTeamRepoResponse = $this->callApi(
+        'PUT',
+        "teams/$strTeamId/repos/$strOrganisation/$strRepository",
+        [
+            'permission' => 'admin',
+        ]
+    );
+
+    return $addTeamRepoResponse === 204 ? true : false;
+  }
+
   /**
    * Makes a call to the Github API
    * @param  [string] $strMethod   - HTTP request method to use
