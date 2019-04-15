@@ -259,6 +259,19 @@ class Canddi_Helper_Github
     ];
   }
 
+    private function disableBranchProtection($strRepository, $arrRules) {
+        $strOrganisation = $this->getOrganisation();
+
+        foreach ($arrRules as $strBranchName => $arrBranchRules) {
+            $defaultBranchResponse = $this->callApi(
+                'DELETE',
+                "repos/$strOrganisation/$strRepository/branches/$strBranchName/protection"
+            );
+        }
+
+        return true;
+    }
+
   public function getCodeowners() {
     return $this->codeowners;
   }
