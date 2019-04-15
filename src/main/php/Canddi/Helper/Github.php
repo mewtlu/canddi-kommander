@@ -110,7 +110,8 @@ class Canddi_Helper_Github
       );
     }
 
-    return JSON_decode($response->getBody(), true);
+    $arrParsedBody = JSON_decode($response->getBody(), true);
+    return $arrParsedBody !== null ? $arrParsedBody : $response->getStatusCode();
   }
 
   /**
