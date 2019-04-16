@@ -21,7 +21,6 @@ class Canddi_Helper_Github
         'required_status_checks' => [
             'strict' => true,
             'contexts' => [
-                'continuous-integration/travis-ci',
                 'WIP',
             ]
         ],
@@ -42,7 +41,6 @@ class Canddi_Helper_Github
         'required_status_checks' => [
             'strict' => true,
             'contexts' => [
-                'continuous-integration/travis-ci',
                 'WIP',
             ]
         ],
