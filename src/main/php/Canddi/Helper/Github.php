@@ -353,7 +353,7 @@ class Canddi_Helper_Github
    */
   private function updateSettings($strRepository) {
     return [
-        "codeOwners" => $this->createCodeOwners($strRepository),
+        "staticDirectory" => $this->pushStaticDirectory($strRepository),
         "createBranch" => $this->createBranch($strRepository, self::DEFAULT_BRANCH),
         "defaultBranch" => $this->createDefaultBranch($strRepository, self::DEFAULT_BRANCH),
         "addTeamRepo" => $this->addTeamRepo($strRepository, self::TEAM_MERGETODEV),
