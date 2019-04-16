@@ -18,9 +18,9 @@ e.g. `./scripts/callPHP.sh -a cli.hello.world.get -p "name=Logan"`
 To edit configuration for your environment, please edit `src/main/php/Canddi/Helper/Config/config/canddi/config.ini`
 To perform commands which require authentication you'll need to populate this file with a valid [Personal Access Token](https://github.com/settings/tokens) from GitHub.
 
-Files stored in the `static/`, such as `CODEOWNERS`, are files to be committed to an updated repository.
+Files stored in the `static/`, such as `CODEOWNERS`, are files that will be automatically committed to an updated repository.
 
-- To update codeowners, change the `static/CODEOWNERS` file.
+- To update codeowners, change the `static/CODEOWNERS` file. The `static/CODEOWNERS` file is required.
 
 ## Unit testing
 Unit tests can be invoked via the following command:
