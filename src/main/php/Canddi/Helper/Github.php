@@ -12,8 +12,9 @@ class Canddi_Helper_Github
 {
   use Canddi_Interface_Singleton;
 
+  const TEAM_MERGETODEV = 'canmergetodev';
   const GITHUB_ROOT_URL = 'https://api.github.com/';
-  const GITHUB_CODEOWNERS_COMMITMSG = 'Create codeowners file';
+  const GITHUB_STATIC_COMMITMSG = 'Add %s';
   const DEFAULT_BRANCH = 'develop';
   const PROTECTION_RULES = [
     'develop' => [
@@ -33,7 +34,7 @@ class Canddi_Helper_Github
 
             ],
             'teams' => [
-                'canmergetodev',
+                self::TEAM_MERGETODEV,
             ],
         ],
     ],
@@ -67,12 +68,33 @@ class Canddi_Helper_Github
     $this->setUsername($this->getConfig()->getGithubUsername());
     $this->setAccessToken($this->getConfig()->getGithubPAT());
     $this->setOrganisation($this->getConfig()->getOrganisation());
-    $this->setCodeOwners($this->getConfig()->getCodeowners());
+    $this->setStaticFiles($this->getConfig()->getStaticFiles());
 
     $this->guzzleConnection = \Canddi_GuzzleFactory::build(
       self::GITHUB_ROOT_URL,
       $this->getAccessToken()
     );
+  }
+
+  private function addTeamRepo($strRepository, $strTeamName) {
+    $strOrganisation = $this->getOrganisation();
+
+    $teamResponse = $this->callApi(
+        'GET',
+        "orgs/$strOrganisation/teams/$strTeamName"
+    );
+
+    $strTeamId = $teamResponse['id'];
+
+    $addTeamRepoResponse = $this->callApi(
+        'PUT',
+        "teams/$strTeamId/repos/$strOrganisation/$strRepository",
+        [
+            'permission' => 'admin',
+        ]
+    );
+
+    return $addTeamRepoResponse === 204 ? true : false;
   }
 
   /**
@@ -110,7 +132,8 @@ class Canddi_Helper_Github
       );
     }
 
-    return JSON_decode($response->getBody(), true);
+    $arrParsedBody = JSON_decode($response->getBody(), true);
+    return $arrParsedBody !== null ? $arrParsedBody : $response->getStatusCode();
   }
 
   /**
@@ -183,44 +206,46 @@ class Canddi_Helper_Github
     return true;
   }
 
-  private function createCodeOwners($strRepository)
+  private function pushStaticDirectory($strRepository)
   {
     $strOrganisation = $this->getOrganisation();
-    $strContent = $this->getCodeowners();
-    $b64Content = base64_encode($strContent);
+    $arrFiles = $this->getStaticFiles();
 
-    /* This code is pretty confusing, maybe could do with refactoring? */
-    try {
-      /* If a 404 is returned from this GET we don't need to pass the SHA. */
-      $getFileResponse = $this->callApi(
-        'GET',
-        "repos/$strOrganisation/$strRepository/contents/.github/CODEOWNERS"
-      );
+    foreach ($arrFiles as $strFilename => $strContent) {
+        $b64Content = base64_encode($strContent);
+        /* This code is pretty confusing, maybe could do with refactoring? */
+        try {
+          /* If a 404 is returned from this GET we don't need to pass the SHA. */
+          $getFileResponse = $this->callApi(
+            'GET',
+            "repos/$strOrganisation/$strRepository/contents/.github/$strFilename"
+          );
 
-      $commitResponse = $this->callApi(
-        'PUT',
-        "repos/$strOrganisation/$strRepository/contents/.github/CODEOWNERS",
-        [
-          "message" => self::GITHUB_CODEOWNERS_COMMITMSG,
-          "content" => $b64Content,
-          "sha" => $getFileResponse["sha"],
-        ]
-      );
+          $commitResponse = $this->callApi(
+            'PUT',
+            "repos/$strOrganisation/$strRepository/contents/.github/$strFilename",
+            [
+              "message" => sprintf(self::GITHUB_STATIC_COMMITMSG, $strFilename),
+              "content" => $b64Content,
+              "sha" => $getFileResponse["sha"],
+            ]
+          );
 
-      return true;
-    } catch (ResponseException $exception) {
-      /* Fallthrough to the request below: */
+          return true;
+        } catch (ResponseException $exception) {
+          /* Fallthrough to the request below: */
+        }
+
+        /* If for some reason the PUT failed with sha, let's try without */
+        $commitResponse = $this->callApi(
+          'PUT',
+          "repos/$strOrganisation/$strRepository/contents/.github/$strFilename",
+          [
+            "message" => sprintf(self::GITHUB_STATIC_COMMITMSG, $strFilename),
+            "content" => $b64Content,
+          ]
+        );
     }
-
-    /* If for some reason the PUT failed with sha, let's try without */
-    $commitResponse = $this->callApi(
-      'PUT',
-      "repos/$strOrganisation/$strRepository/contents/.github/CODEOWNERS",
-      [
-        "message" => self::GITHUB_CODEOWNERS_COMMITMSG,
-        "content" => $b64Content,
-      ]
-    );
 
     return true;
   }
@@ -263,17 +288,24 @@ class Canddi_Helper_Github
         $strOrganisation = $this->getOrganisation();
 
         foreach ($arrRules as $strBranchName => $arrBranchRules) {
-            $defaultBranchResponse = $this->callApi(
-                'DELETE',
-                "repos/$strOrganisation/$strRepository/branches/$strBranchName/protection"
-            );
+            try {
+                $defaultBranchResponse = $this->callApi(
+                    'DELETE',
+                    "repos/$strOrganisation/$strRepository/branches/$strBranchName/protection"
+                );
+            } catch (ResponseException $exception) {
+                // if 404, ignore as the branch just hasn't been create yet
+                if (false === strpos($exception, '404')) {
+                    throw $exception;
+                }
+            }
         }
 
         return true;
     }
 
-  public function getCodeowners() {
-    return $this->codeowners;
+  public function getStaticFiles() {
+    return $this->static_files;
   }
 
   public function getConfig() {
@@ -296,8 +328,8 @@ class Canddi_Helper_Github
     $this->access_token = $strAccessToken;
   }
 
-  public function setCodeOwners($strCodeowners) {
-    $this->codeowners = $strCodeowners;
+  public function setStaticFiles($arrStaticFiles) {
+    $this->static_files = $arrStaticFiles;
   }
 
   public function setConfig($modelHelperConfig) {
@@ -328,9 +360,10 @@ class Canddi_Helper_Github
    */
   private function updateSettings($strRepository) {
     return [
-        "codeOwners" => $this->createCodeOwners($strRepository),
+        "staticDirectory" => $this->pushStaticDirectory($strRepository),
         "createBranch" => $this->createBranch($strRepository, self::DEFAULT_BRANCH),
         "defaultBranch" => $this->createDefaultBranch($strRepository, self::DEFAULT_BRANCH),
+        "addTeamRepo" => $this->addTeamRepo($strRepository, self::TEAM_MERGETODEV),
         "branchProtection" => $this->createBranchProtection($strRepository, self::PROTECTION_RULES),
     ];
   }

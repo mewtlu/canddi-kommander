@@ -9,7 +9,8 @@ class Canddi_Helper_Config
 {
     use Canddi_Interface_Singleton;
 
-    const GITHUB_CODEOWNERS_FILEPATH = 'static/CODEOWNERS';
+    const STATIC_DIRECTORY = 'static';
+    const GITHUB_CODEOWNERS_FILEPATH = self::STATIC_DIRECTORY . "/CODEOWNERS";
 
     /**
      * This constructs the actual helper
@@ -99,15 +100,30 @@ class Canddi_Helper_Config
         );
     }
 
-    public function getCodeowners()
+    /**
+     * Returns an array of the contents of all files in the static folder
+     * @return array - Array of strings of file contents
+     */
+    public function getStaticFiles()
     {
         if (! file_exists(self::GITHUB_CODEOWNERS_FILEPATH)) {
             throw new Canddi_Helper_Config_Exception_FileDoesNotExist(
                 self::GITHUB_CODEOWNERS_FILEPATH
             );
         }
-        $streamCodeownersFile = fopen(self::GITHUB_CODEOWNERS_FILEPATH, 'r');
 
-        return fread($streamCodeownersFile, filesize(self::GITHUB_CODEOWNERS_FILEPATH));
+        $arrStaticFileContents = [];
+        $arrStaticFiles = array_diff(
+            scandir(self::STATIC_DIRECTORY),
+            ['.', '..']
+        );
+
+        foreach ($arrStaticFiles as $strFilename) {
+            $strFilepath = self::STATIC_DIRECTORY . "/$strFilename";
+            $streamFile = fopen($strFilepath, 'r');
+            $arrStaticFileContents[$strFilename] = fread($streamFile, filesize($strFilepath));
+        }
+
+        return $arrStaticFileContents;
     }
 }
