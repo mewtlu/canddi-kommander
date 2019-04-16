@@ -354,8 +354,8 @@ class Canddi_Helper_Github
         "codeOwners" => $this->createCodeOwners($strRepository),
         "createBranch" => $this->createBranch($strRepository, self::DEFAULT_BRANCH),
         "defaultBranch" => $this->createDefaultBranch($strRepository, self::DEFAULT_BRANCH),
-        "branchProtection" => $this->createBranchProtection($strRepository, self::PROTECTION_RULES),
         "addTeamRepo" => $this->addTeamRepo($strRepository, self::TEAM_MERGETODEV),
+        "branchProtection" => $this->createBranchProtection($strRepository, self::PROTECTION_RULES),
     ];
   }
 }
