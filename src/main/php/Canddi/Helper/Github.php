@@ -14,7 +14,7 @@ class Canddi_Helper_Github
 
   const TEAM_MERGETODEV = 'canmergetodev';
   const GITHUB_ROOT_URL = 'https://api.github.com/';
-  const GITHUB_CODEOWNERS_COMMITMSG = 'Create codeowners file';
+  const GITHUB_STATIC_COMMITMSG = 'Add %s';
   const DEFAULT_BRANCH = 'develop';
   const PROTECTION_RULES = [
     'develop' => [
@@ -68,7 +68,7 @@ class Canddi_Helper_Github
     $this->setUsername($this->getConfig()->getGithubUsername());
     $this->setAccessToken($this->getConfig()->getGithubPAT());
     $this->setOrganisation($this->getConfig()->getOrganisation());
-    $this->setCodeOwners($this->getConfig()->getCodeowners());
+    $this->setStaticFiles($this->getConfig()->getStaticFiles());
 
     $this->guzzleConnection = \Canddi_GuzzleFactory::build(
       self::GITHUB_ROOT_URL,
@@ -206,44 +206,46 @@ class Canddi_Helper_Github
     return true;
   }
 
-  private function createCodeOwners($strRepository)
+  private function pushStaticDirectory($strRepository)
   {
     $strOrganisation = $this->getOrganisation();
-    $strContent = $this->getCodeowners();
-    $b64Content = base64_encode($strContent);
+    $arrFiles = $this->getStaticFiles();
 
-    /* This code is pretty confusing, maybe could do with refactoring? */
-    try {
-      /* If a 404 is returned from this GET we don't need to pass the SHA. */
-      $getFileResponse = $this->callApi(
-        'GET',
-        "repos/$strOrganisation/$strRepository/contents/.github/CODEOWNERS"
-      );
+    foreach ($arrFiles as $strFilename => $strContent) {
+        $b64Content = base64_encode($strContent);
+        /* This code is pretty confusing, maybe could do with refactoring? */
+        try {
+          /* If a 404 is returned from this GET we don't need to pass the SHA. */
+          $getFileResponse = $this->callApi(
+            'GET',
+            "repos/$strOrganisation/$strRepository/contents/.github/$strFilename"
+          );
 
-      $commitResponse = $this->callApi(
-        'PUT',
-        "repos/$strOrganisation/$strRepository/contents/.github/CODEOWNERS",
-        [
-          "message" => self::GITHUB_CODEOWNERS_COMMITMSG,
-          "content" => $b64Content,
-          "sha" => $getFileResponse["sha"],
-        ]
-      );
+          $commitResponse = $this->callApi(
+            'PUT',
+            "repos/$strOrganisation/$strRepository/contents/.github/$strFilename",
+            [
+              "message" => sprintf(self::GITHUB_STATIC_COMMITMSG, $strFilename),
+              "content" => $b64Content,
+              "sha" => $getFileResponse["sha"],
+            ]
+          );
 
-      return true;
-    } catch (ResponseException $exception) {
-      /* Fallthrough to the request below: */
+          return true;
+        } catch (ResponseException $exception) {
+          /* Fallthrough to the request below: */
+        }
+
+        /* If for some reason the PUT failed with sha, let's try without */
+        $commitResponse = $this->callApi(
+          'PUT',
+          "repos/$strOrganisation/$strRepository/contents/.github/$strFilename",
+          [
+            "message" => sprintf(self::GITHUB_STATIC_COMMITMSG, $strFilename),
+            "content" => $b64Content,
+          ]
+        );
     }
-
-    /* If for some reason the PUT failed with sha, let's try without */
-    $commitResponse = $this->callApi(
-      'PUT',
-      "repos/$strOrganisation/$strRepository/contents/.github/CODEOWNERS",
-      [
-        "message" => self::GITHUB_CODEOWNERS_COMMITMSG,
-        "content" => $b64Content,
-      ]
-    );
 
     return true;
   }
