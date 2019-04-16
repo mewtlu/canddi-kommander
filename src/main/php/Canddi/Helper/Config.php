@@ -119,7 +119,6 @@ class Canddi_Helper_Config
         );
 
         foreach ($arrStaticFiles as $strFilename) {
-            echo $strFilename;
             $strFilepath = self::STATIC_DIRECTORY . "/$strFilename";
             $streamFile = fopen($strFilepath, 'r');
             $arrStaticFileContents[$strFilename] = fread($streamFile, filesize($strFilepath));
