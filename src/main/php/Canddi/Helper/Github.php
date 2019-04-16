@@ -297,8 +297,8 @@ class Canddi_Helper_Github
         return true;
     }
 
-  public function getCodeowners() {
-    return $this->codeowners;
+  public function getStaticFiles() {
+    return $this->static_files;
   }
 
   public function getConfig() {
@@ -321,8 +321,8 @@ class Canddi_Helper_Github
     $this->access_token = $strAccessToken;
   }
 
-  public function setCodeOwners($strCodeowners) {
-    $this->codeowners = $strCodeowners;
+  public function setStaticFiles($arrStaticFiles) {
+    $this->static_files = $arrStaticFiles;
   }
 
   public function setConfig($modelHelperConfig) {
