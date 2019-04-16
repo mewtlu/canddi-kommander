@@ -288,10 +288,17 @@ class Canddi_Helper_Github
         $strOrganisation = $this->getOrganisation();
 
         foreach ($arrRules as $strBranchName => $arrBranchRules) {
-            $defaultBranchResponse = $this->callApi(
-                'DELETE',
-                "repos/$strOrganisation/$strRepository/branches/$strBranchName/protection"
-            );
+            try {
+                $defaultBranchResponse = $this->callApi(
+                    'DELETE',
+                    "repos/$strOrganisation/$strRepository/branches/$strBranchName/protection"
+                );
+            } catch (ResponseException $exception) {
+                // if 404, ignore as the branch just hasn't been create yet
+                if (false === strpos($exception, '404')) {
+                    throw $exception;
+                }
+            }
         }
 
         return true;
