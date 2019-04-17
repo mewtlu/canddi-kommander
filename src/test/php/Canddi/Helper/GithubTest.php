@@ -34,6 +34,9 @@ class GithubTest
             'README.md' => "# Example README\n\ntest example\n\n* 1\n* 2",
         ];
 
+        $this->assertTrue(
+            $modelHelperGithub->getConfig() instanceOf \Canddi_Helper_Config
+        );
         $this->assertEquals(
             $strGithubUsername,
             $modelHelperGithub->getUsername()
