@@ -45,7 +45,7 @@ $paths = array(
 set_include_path(get_include_path().PATH_SEPARATOR.implode(PATH_SEPARATOR, $paths));
 
 require_once TEST_PATH.'/cli/CliControllerTestCase.php';
-
+require_once TEST_PATH.'/Canddi/TestCase.php';
 
 require_once MOCKERY_PATH.'/Mockery/Loader.php';
 require_once MOCKERY_PATH.'/Mockery/Configuration.php';

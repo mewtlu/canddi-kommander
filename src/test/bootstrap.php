@@ -16,7 +16,7 @@ define('ENVIRONMENT_TYPE_PATH', TEST_PATH.'/../');
 require_once APPLICATION_PATH.'/environments.php';
 
 require_once TEST_PATH.'/cli/CliControllerTestCase.php';
-
+require_once TEST_PATH.'/Canddi/TestCase.php';
 
 require_once VENDOR_PATH.'/autoload.php';
 
