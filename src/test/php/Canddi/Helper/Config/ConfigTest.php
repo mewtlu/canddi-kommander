@@ -3,7 +3,7 @@
 namespace Canddi\Kommander\Helper\Config;
 use Canddi\Kommander\TestCase;
 
-class Canddi_Helper_ConfigTest
+class ConfigTest
     extends TestCase
 {
     public function testConstructInstance()
