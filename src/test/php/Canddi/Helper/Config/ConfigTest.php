@@ -41,12 +41,10 @@ class Canddi_Helper_ConfigTest
         $strGithubUsername = 'Unit-Test-USER';
         $strGithubPAT = 'Unit-Test-PAT';
         $strGithubOrganisation = 'Unit-Test-ORG';
-        $arrStaticFiles = [];
-
-        $modelHelperConfig->setGithubUsername($strGithubUsername);
-        $modelHelperConfig->setGithubPAT($strGithubPAT);
-        $modelHelperConfig->setOrganisation($strGithubOrganisation);
-        $modelHelperConfig->setStaticFiles($arrStaticFiles);
+        $arrStaticFiles = [
+            'CODEOWNERS' => '* @Deep-Web-Technologies/canmergetodev',
+            'README.md' => "# Example README\n\ntest example\n\n* 1\n* 2",
+        ];
 
         $this->assertEquals(
             $strGithubUsername,
@@ -57,7 +55,7 @@ class Canddi_Helper_ConfigTest
             $modelHelperConfig->getGithubPAT()
         );
         $this->assertEquals(
-            $strOrganisation,
+            $strGithubOrganisation,
             $modelHelperConfig->getOrganisation()
         );
         $this->assertEquals(
