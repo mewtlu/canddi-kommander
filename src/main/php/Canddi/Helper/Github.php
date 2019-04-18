@@ -24,7 +24,7 @@ class Canddi_Helper_Github
                 'WIP',
             ]
         ],
-        'enforce_admins' => true,
+        'enforce_admins' => false,
         'required_pull_request_reviews' => [
             'require_code_owner_reviews' => true,
         ],
@@ -44,7 +44,7 @@ class Canddi_Helper_Github
                 'WIP',
             ]
         ],
-        'enforce_admins' => true,
+        'enforce_admins' => false,
         'required_pull_request_reviews' => [
             'require_code_owner_reviews' => true,
         ],
@@ -164,7 +164,7 @@ class Canddi_Helper_Github
     );
 
     // create the branch
-    $createBranchResponse = $this->callApi(
+    $this->callApi(
       'POST',
       "repos/$strOrganisation/$strRepository/git/refs",
       [
@@ -180,7 +180,7 @@ class Canddi_Helper_Github
     $strOrganisation = $this->getOrganisation();
 
     foreach ($arrRules as $strBranchName => $arrBranchRules) {
-        $defaultBranchResponse = $this->callApi(
+        $this->callApi(
           'PUT',
           "repos/$strOrganisation/$strRepository/branches/$strBranchName/protection",
           $arrBranchRules
@@ -194,7 +194,7 @@ class Canddi_Helper_Github
   {
     $strOrganisation = $this->getOrganisation();
 
-    $defaultBranchResponse = $this->callApi(
+    $this->callApi(
       'PATCH',
       "repos/$strOrganisation/$strRepository",
       [
@@ -237,7 +237,7 @@ class Canddi_Helper_Github
         }
 
         /* If for some reason the PUT failed with sha, let's try without */
-        $commitResponse = $this->callApi(
+        $this->callApi(
           'PUT',
           "repos/$strOrganisation/$strRepository/contents/.github/$strFilename",
           [
@@ -289,7 +289,7 @@ class Canddi_Helper_Github
 
         foreach ($arrRules as $strBranchName => $arrBranchRules) {
             try {
-                $defaultBranchResponse = $this->callApi(
+                $this->callApi(
                     'DELETE',
                     "repos/$strOrganisation/$strRepository/branches/$strBranchName/protection"
                 );
@@ -326,6 +326,23 @@ class Canddi_Helper_Github
 
   public function getStaticFiles() {
     return $this->static_files;
+  }
+
+  public function listRepositories() {
+    $strOrganisation = $this->getOrganisation();
+
+    $repositoriesResponse = $this->callApi(
+      'GET',
+      "orgs/$strOrganisation/repos"
+    );
+
+    $arrRepositories = [];
+
+    foreach($repositoriesResponse as $arrRepository) {
+      $arrRepositories[] = $arrRepository['name'];
+    }
+
+    return $arrRepositories;
   }
 
   public function setAccessToken($strAccessToken) {
