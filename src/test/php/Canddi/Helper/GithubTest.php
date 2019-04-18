@@ -57,4 +57,63 @@ class GithubTest
             $modelHelperGithub->getGuzzleConnection() instanceOf GuzzleClient
         );
     }
+
+    public function testAddTeamRepo()
+    {
+        $modelHelperGithub = \Canddi_Helper_Github::getInstance();
+
+        $strGithubRoot = 'https://api.github.com';
+        $strOrganisation = 'Unit-Test-ORG';
+        $strRepository = 'testRepository';
+        $strTeamName = 'testTeam';
+        $intTeamId = 1;
+        $intSuccessStatus = 204;
+
+        $mockGetGuzzleResponse = \Mockery::mock('\GuzzleHttp\Psr7\Response')
+            ->shouldReceive('getBody')
+            ->once()
+            ->andReturn(JSON_encode([
+                'id' => $intTeamId,
+            ]))
+            ->mock();
+        $mockPutGuzzleResponse = \Mockery::mock('\GuzzleHttp\Psr7\Response')
+            ->shouldReceive('getBody')
+            ->once()
+            ->andReturn(null)
+            ->shouldReceive('getStatusCode')
+            ->once()
+            ->andReturn($intSuccessStatus)
+            ->mock();
+
+        $mockGuzzleConnection = \Mockery::mock('\GuzzleHttp\Client')
+            ->shouldReceive('request')
+            ->once()
+            ->with(
+                'GET',
+                "$strGithubRoot/orgs/$strOrganisation/teams/$strTeamName",
+                [
+                    'json' => [],
+                ]
+            )
+            ->andReturn($mockGetGuzzleResponse)
+            ->shouldReceive('request')
+            ->once()
+            ->with(
+                'PUT',
+                "$strGithubRoot/teams/$intTeamId/repos/$strOrganisation/$strRepository",
+                [
+                    'json' => [
+                        'permission' => 'admin',
+                    ],
+                ]
+            )
+            ->andReturn($mockPutGuzzleResponse)
+            ->mock();
+
+        $modelHelperGithub->setGuzzleConnection($mockGuzzleConnection); // inject guzzle
+
+        $boolAddTeamRepoResponse = $this->_invokeProtMethod($modelHelperGithub, 'addTeamRepo', $strRepository, $strTeamName);
+
+        $this->assertTrue($boolAddTeamRepoResponse);
+    }
 }
