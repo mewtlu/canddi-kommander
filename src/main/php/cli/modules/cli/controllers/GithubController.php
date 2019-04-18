@@ -23,6 +23,37 @@ extends Cli_Abstract
     }
 
     /**
+     * Returns a list of commands to run which will update all repos on an org
+     *
+     * Example usage: ./scripts/callPHP.sh -a cli.github.commands.get
+     *
+     * Parameters:
+     *   repository
+     *
+     * @return void
+     * @author Luke Roberts
+     **/
+    public function commandsAction_GET()
+    {
+        $strCommandFormat = './scripts/callPHP.sh -a cli.github.update.post -p "repository=%s";';
+        $github = \Canddi_Helper_Github::getInstance();
+
+        $arrRepositories = $github->listRepositories();
+
+        $strCommands = '';
+        $arrCommands = [];
+
+        foreach($arrRepositories as $strRepository) {
+            $strCommand = sprintf($strCommandFormat, $strRepository);
+            $arrCommands[] = $strCommand;
+        }
+
+        $strCommands = implode(PHP_EOL, $arrCommands).PHP_EOL;
+
+        echo $strCommands;
+    }
+
+    /**
      * Creates a repository and initalizes it with required config
      *
      * Example usage: ./scripts/callPHP.sh -a cli.github.create.post -p "repository=canddi-kommander"
