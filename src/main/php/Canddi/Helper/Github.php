@@ -322,6 +322,23 @@ class Canddi_Helper_Github
     return $this->organisation;
   }
 
+  public function listRepositories() {
+    $strOrganisation = $this->getOrganisation();
+
+    $repositoriesResponse = $this->callApi(
+      'GET',
+      "orgs/$strOrganisation/repos"
+    );
+
+    $arrRepositories = [];
+
+    foreach($repositoriesResponse as $arrRepository) {
+      $arrRepositories[] = $arrRepository['name'];
+    }
+
+    return $arrRepositories;
+  }
+
   public function setAccessToken($strAccessToken) {
     $this->access_token = $strAccessToken;
   }
