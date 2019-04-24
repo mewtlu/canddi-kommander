@@ -227,4 +227,65 @@ class GithubTest
 
         $this->assertTrue($boolCreateBranchResponse);
     }
+
+    public function testCreateBranchProtection()
+    {
+        $modelHelperGithub = \Canddi_Helper_Github::getInstance();
+
+        $strGithubRoot = 'https://api.github.com';
+        $strOrganisation = 'Unit-Test-ORG';
+        $strRepository = 'testRepository';
+        $strBranchName1 = 'testBranch1';
+        $strBranchName2 = 'testBranch2';
+        $arrBranchRules = [
+            'example_rule' => true,
+        ];
+        $arrRules = [
+            $strBranchName1 => $arrBranchRules,
+            $strBranchName2 => $arrBranchRules,
+        ];
+        $strSha = 'exampleshastring';
+        $intTeamId = 1;
+        $intSuccessStatus = 204;
+
+        $mockPutGuzzleResponse1 = \Mockery::mock('\GuzzleHttp\Psr7\Response')
+            ->shouldReceive('getBody')
+            ->once()
+            ->andReturn(JSON_encode([]))
+            ->mock();
+        $mockPutGuzzleResponse2 = \Mockery::mock('\GuzzleHttp\Psr7\Response')
+            ->shouldReceive('getBody')
+            ->once()
+            ->andReturn(JSON_encode([]))
+            ->mock();
+
+        $mockGuzzleConnection = \Mockery::mock('\GuzzleHttp\Client')
+            ->shouldReceive('request')
+            ->once()
+            ->with(
+                'PUT',
+                "$strGithubRoot/repos/$strOrganisation/$strRepository/branches/$strBranchName1/protection",
+                [
+                    'json' => $arrBranchRules,
+                ]
+            )
+            ->andReturn($mockPutGuzzleResponse1)
+            ->shouldReceive('request')
+            ->once()
+            ->with(
+                'PUT',
+                "$strGithubRoot/repos/$strOrganisation/$strRepository/branches/$strBranchName2/protection",
+                [
+                    'json' => $arrBranchRules,
+                ]
+            )
+            ->andReturn($mockPutGuzzleResponse2)
+            ->mock();
+
+        $modelHelperGithub->setGuzzleConnection($mockGuzzleConnection); // inject guzzle
+
+        $boolCreateBranchProtectionResponse = $this->_invokeProtMethod($modelHelperGithub, 'createBranchProtection', $strRepository, $arrRules);
+
+        $this->assertTrue($boolCreateBranchProtectionResponse);
+    }
 }
