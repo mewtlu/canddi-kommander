@@ -139,7 +139,7 @@ class GithubTest
             ->once()
             ->with(
                 'GET',
-                "repos/$strOrganisation/$strRepository/branches/$strBranchName",
+                "$strGithubRoot/repos/$strOrganisation/$strRepository/branches/$strBranchName",
                 [
                     'json' => [],
                 ]
@@ -183,7 +183,7 @@ class GithubTest
             ->once()
             ->with(
                 'GET',
-                "repos/$strOrganisation/$strRepository/branches/$strBranchName",
+                "$strGithubRoot/repos/$strOrganisation/$strRepository/branches/$strBranchName",
                 [
                     'json' => [],
                 ]
@@ -193,7 +193,7 @@ class GithubTest
             ->once()
             ->with(
                 'GET',
-                "repos/$strOrganisation/$strRepository/git/refs/heads",
+                "$strGithubRoot/repos/$strOrganisation/$strRepository/git/refs/heads",
                 [
                     'json' => [],
                 ]
@@ -203,7 +203,7 @@ class GithubTest
             ->once()
             ->with(
                 'POST',
-                "repos/$strOrganisation/$strRepository/git/refs",
+                "$strGithubRoot/repos/$strOrganisation/$strRepository/git/refs",
                 [
                     'json' => [
                         "ref" => "refs/heads/$strBranchName",
