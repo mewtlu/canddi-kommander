@@ -43,7 +43,6 @@ class ConfigTest
         $strGithubOrganisation = 'Unit-Test-ORG';
         $arrStaticFiles = [
             'CODEOWNERS' => '* @Deep-Web-Technologies/canmergetodev',
-            'README.md' => "# Example README\n\ntest example\n\n* 1\n* 2",
         ];
 
         $this->assertEquals(
