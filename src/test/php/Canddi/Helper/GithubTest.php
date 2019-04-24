@@ -2,6 +2,7 @@
 
 namespace Canddi\Kommander\Helper\Config;
 use Canddi\Kommander\TestCase;
+use Canddi\Kommander\Exception\Fatal\ResponseException;
 use GuzzleHttp\Client as GuzzleClient;
 
 class GithubTest
@@ -144,6 +145,72 @@ class GithubTest
                 ]
             )
             ->andReturn($mockGetGuzzleResponse)
+            ->mock();
+
+        $modelHelperGithub->setGuzzleConnection($mockGuzzleConnection); // inject guzzle
+
+        $boolCreateBranchResponse = $this->_invokeProtMethod($modelHelperGithub, 'createBranch', $strRepository, $strBranchName);
+
+        $this->assertTrue($boolCreateBranchResponse);
+    }
+
+    public function createBranch_new()
+    {
+        $modelHelperGithub = \Canddi_Helper_Github::getInstance();
+
+        $strGithubRoot = 'https://api.github.com';
+        $strOrganisation = 'Unit-Test-ORG';
+        $strRepository = 'testRepository';
+        $strBranchName = 'testBranch';
+        $strSha = 'exampleshastring';
+        $intTeamId = 1;
+        $intSuccessStatus = 204;
+
+        $mockGetGuzzleResponse = \Mockery::mock('\GuzzleHttp\Psr7\Response')
+            ->shouldReceive('getBody')
+            ->once()
+            ->andReturn(JSON_encode([
+                [
+                    "object" => [
+                        "sha" => $strSha,
+                    ],
+                ],
+            ]))
+            ->mock();
+
+        $mockGuzzleConnection = \Mockery::mock('\GuzzleHttp\Client')
+            ->shouldReceive('request')
+            ->once()
+            ->with(
+                'GET',
+                "repos/$strOrganisation/$strRepository/branches/$strBranchName",
+                [
+                    'json' => [],
+                ]
+            )
+            ->andThrow(new ResponseException)
+            ->shouldReceive('request')
+            ->once()
+            ->with(
+                'GET',
+                "repos/$strOrganisation/$strRepository/git/refs/heads",
+                [
+                    'json' => [],
+                ]
+            )
+            ->andReturn($mockGetGuzzleResponse)
+            ->shouldReceive('request')
+            ->once()
+            ->with(
+                'POST',
+                "repos/$strOrganisation/$strRepository/git/refs",
+                [
+                    'json' => [
+                        "ref" => "refs/heads/$strBranchName",
+                        "sha" => $getHashResponse[0]['object']['sha']
+                    ],
+                ]
+            )
             ->mock();
 
         $modelHelperGithub->setGuzzleConnection($mockGuzzleConnection); // inject guzzle
