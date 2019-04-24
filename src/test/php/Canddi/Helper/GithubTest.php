@@ -178,6 +178,13 @@ class GithubTest
             ]))
             ->mock();
 
+        $mockPostGuzzleResponse = \Mockery::mock('\GuzzleHttp\Psr7\Response')
+            ->shouldReceive('getBody')
+            ->once()
+            ->andReturn(JSON_encode([]))
+            ->mock();
+
+
         $mockGuzzleConnection = \Mockery::mock('\GuzzleHttp\Client')
             ->shouldReceive('request')
             ->once()
@@ -188,7 +195,7 @@ class GithubTest
                     'json' => [],
                 ]
             )
-            ->andThrow(new ResponseException)
+            ->andThrow(new ResponseException(500, 'example exception', []))
             ->shouldReceive('request')
             ->once()
             ->with(
@@ -207,10 +214,11 @@ class GithubTest
                 [
                     'json' => [
                         "ref" => "refs/heads/$strBranchName",
-                        "sha" => $getHashResponse[0]['object']['sha']
+                        "sha" => $strSha
                     ],
                 ]
             )
+            ->andReturn($mockPostGuzzleResponse)
             ->mock();
 
         $modelHelperGithub->setGuzzleConnection($mockGuzzleConnection); // inject guzzle
