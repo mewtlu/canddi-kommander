@@ -117,7 +117,7 @@ class GithubTest
         $this->assertTrue($boolAddTeamRepoResponse);
     }
 
-    public function createBranch_exists()
+    public function testCreateBranch_exists()
     {
         $modelHelperGithub = \Canddi_Helper_Github::getInstance();
 
@@ -154,7 +154,7 @@ class GithubTest
         $this->assertTrue($boolCreateBranchResponse);
     }
 
-    public function createBranch_new()
+    public function testCreateBranch_new()
     {
         $modelHelperGithub = \Canddi_Helper_Github::getInstance();
 
