@@ -115,4 +115,41 @@ class GithubTest
 
         $this->assertTrue($boolAddTeamRepoResponse);
     }
+
+    public function createBranch_exists()
+    {
+        $modelHelperGithub = \Canddi_Helper_Github::getInstance();
+
+        $strGithubRoot = 'https://api.github.com';
+        $strOrganisation = 'Unit-Test-ORG';
+        $strRepository = 'testRepository';
+        $strBranchName = 'testBranch';
+        $intTeamId = 1;
+        $intSuccessStatus = 204;
+
+        $mockGetGuzzleResponse = \Mockery::mock('\GuzzleHttp\Psr7\Response')
+            ->shouldReceive('getBody')
+            ->once()
+            ->andReturn(JSON_encode([]))
+            ->mock();
+
+        $mockGuzzleConnection = \Mockery::mock('\GuzzleHttp\Client')
+            ->shouldReceive('request')
+            ->once()
+            ->with(
+                'GET',
+                "repos/$strOrganisation/$strRepository/branches/$strBranchName",
+                [
+                    'json' => [],
+                ]
+            )
+            ->andReturn($mockGetGuzzleResponse)
+            ->mock();
+
+        $modelHelperGithub->setGuzzleConnection($mockGuzzleConnection); // inject guzzle
+
+        $boolCreateBranchResponse = $this->_invokeProtMethod($modelHelperGithub, 'createBranch', $strRepository, $strBranchName);
+
+        $this->assertTrue($boolCreateBranchResponse);
+    }
 }
