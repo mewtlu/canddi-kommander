@@ -117,6 +117,54 @@ class GithubTest
         $this->assertTrue($boolAddTeamRepoResponse);
     }
 
+    public function testGettersSetters()
+    {
+        $modelHelperGithub = \Canddi_Helper_Github::getInstance();
+
+        $strUsername = 'Unit-Test-Username';
+        $strOrganisation = 'Unit-Test-ORG';
+        $strAccessToken = 'Unit-Test-PAT';
+        $arrConfig = ['rule' => 'test'];
+        $guzzleConnection = \Mockery::mock('\GuzzleHttp\Client');
+        $arrStaticFiles = ['CODEOWNERS' => 'example content'];
+
+        $modelHelperGithub->setAccessToken($strAccessToken);
+        $modelHelperGithub->setConfig($arrConfig);
+        $modelHelperGithub->setGuzzleConnection($guzzleConnection);
+        $modelHelperGithub->setOrganisation($strOrganisation);
+        $modelHelperGithub->setStaticFiles($arrStaticFiles);
+        $modelHelperGithub->setUsername($strUsername);
+
+        $this->assertEquals(
+            $strUsername,
+            $modelHelperGithub->getUsername($strUsername)
+        );
+        $this->assertEquals(
+            $strOrganisation,
+            $modelHelperGithub->getOrganisation($strOrganisation)
+        );
+        $this->assertEquals(
+            $strAccessToken,
+            $modelHelperGithub->getAccessToken($strAccessToken)
+        );
+        $this->assertEquals(
+            $arrConfig,
+            $modelHelperGithub->getConfig($arrConfig)
+        );
+        $this->assertEquals(
+            $arrStaticFiles,
+            $modelHelperGithub->getStaticFiles($arrStaticFiles)
+        );
+
+        $this->assertEquals(
+            $guzzleConnection,
+            $modelHelperGithub->getGuzzleConnection($guzzleConnection)
+        );
+        $this->assertTrue(
+            $modelHelperGithub->getGuzzleConnection() instanceOf GuzzleClient
+        );
+    }
+
     public function testCreateBranch_exists()
     {
         $modelHelperGithub = \Canddi_Helper_Github::getInstance();
