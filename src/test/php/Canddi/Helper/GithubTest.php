@@ -447,4 +447,53 @@ class GithubTest
 
         $this->assertTrue($boolPushStaticDirectoryResponse);
     }
+
+    public function testCreateNewRepository()
+    {
+        $modelHelperGithub = \Canddi_Helper_Github::getInstance();
+
+        $strGithubRoot = 'https://api.github.com';
+        $strOrganisation = 'Unit-Test-ORG';
+        $strRepository = 'testRepository';
+        $intRepositoryId = 1;
+        $boolRepositoryPrivate = true;
+
+        $mockPostGuzzleResponse = \Mockery::mock('\GuzzleHttp\Psr7\Response')
+            ->shouldReceive('getBody')
+            ->once()
+            ->andReturn(JSON_encode([
+                'id' => $intRepositoryId,
+                'name' => $strRepository,
+                'private' => $boolRepositoryPrivate,
+            ]))
+            ->mock();
+
+        $mockGuzzleConnection = \Mockery::mock('\GuzzleHttp\Client')
+            ->shouldReceive('request')
+            ->once()
+            ->with(
+                'POST',
+                "$strGithubRoot/orgs/$strOrganisation/repos",
+                [
+                    'json' => [
+                        'name' => $strRepository,
+                        'private' => $boolRepositoryPrivate,
+                    ],
+                ]
+            )
+            ->andReturn($mockPostGuzzleResponse)
+            ->mock();
+
+        $modelHelperGithub->setGuzzleConnection($mockGuzzleConnection); // inject guzzle
+
+        $arrExpectedResult = [
+            'id' => $intRepositoryId,
+            'name' => $strRepository,
+            'private' => $boolRepositoryPrivate,
+        ];
+
+        $arrPushStaticDirectoryResponse = $this->_invokeProtMethod($modelHelperGithub, 'createNewRepository', $strRepository);
+
+        $this->assertEquals($arrExpectedResult, $arrPushStaticDirectoryResponse);
+    }
 }
