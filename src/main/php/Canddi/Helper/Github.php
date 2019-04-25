@@ -68,9 +68,11 @@ class Canddi_Helper_Github
     $this->setOrganisation($this->getConfig()->getOrganisation());
     $this->setStaticFiles($this->getConfig()->getStaticFiles());
 
-    $this->guzzleConnection = \Canddi_GuzzleFactory::build(
-      self::GITHUB_ROOT_URL,
-      $this->getAccessToken()
+    $this->setGuzzleConnection(
+      \Canddi_GuzzleFactory::build(
+        self::GITHUB_ROOT_URL,
+        $this->getAccessToken()
+      )
     );
   }
 
@@ -105,7 +107,7 @@ class Canddi_Helper_Github
    */
   private function callApi($strMethod, $strEndpoint, $arrBody = []) {
     try {
-      $response = $this->guzzleConnection->request(
+      $response = $this->getGuzzleConnection()->request(
         $strMethod,
         self::GITHUB_ROOT_URL . "$strEndpoint",
         [
@@ -302,10 +304,6 @@ class Canddi_Helper_Github
         return true;
     }
 
-  public function getStaticFiles() {
-    return $this->static_files;
-  }
-
   public function getConfig() {
     return $this->config;
   }
@@ -318,8 +316,16 @@ class Canddi_Helper_Github
     return $this->access_token;
   }
 
+  public function getGuzzleConnection() {
+    return $this->guzzleConnection;
+  }
+
   public function getOrganisation() {
     return $this->organisation;
+  }
+
+  public function getStaticFiles() {
+    return $this->static_files;
   }
 
   public function listRepositories() {
@@ -343,16 +349,20 @@ class Canddi_Helper_Github
     $this->access_token = $strAccessToken;
   }
 
-  public function setStaticFiles($arrStaticFiles) {
-    $this->static_files = $arrStaticFiles;
-  }
-
   public function setConfig($modelHelperConfig) {
     $this->config = $modelHelperConfig;
   }
 
+  public function setGuzzleConnection($guzzleConnection) {
+    $this->guzzleConnection = $guzzleConnection;
+  }
+
   public function setOrganisation($strOrganisation) {
     $this->organisation = $strOrganisation;
+  }
+
+  public function setStaticFiles($arrStaticFiles) {
+    $this->static_files = $arrStaticFiles;
   }
 
   public function setUsername($strUsername) {

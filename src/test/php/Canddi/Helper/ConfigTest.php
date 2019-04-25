@@ -3,7 +3,7 @@
 namespace Canddi\Kommander\Helper\Config;
 use Canddi\Kommander\TestCase;
 
-class Canddi_Helper_ConfigTest
+class ConfigTest
     extends TestCase
 {
     public function testConstructInstance()
@@ -43,7 +43,6 @@ class Canddi_Helper_ConfigTest
         $strGithubOrganisation = 'Unit-Test-ORG';
         $arrStaticFiles = [
             'CODEOWNERS' => '* @Deep-Web-Technologies/canmergetodev',
-            'README.md' => "# Example README\n\ntest example\n\n* 1\n* 2",
         ];
 
         $this->assertEquals(
