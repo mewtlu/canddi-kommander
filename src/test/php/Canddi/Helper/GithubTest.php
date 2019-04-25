@@ -496,4 +496,51 @@ class GithubTest
 
         $this->assertEquals($arrExpectedResult, $arrPushStaticDirectoryResponse);
     }
+
+    public function testListRepositories()
+    {
+        $modelHelperGithub = \Canddi_Helper_Github::getInstance();
+
+        $strGithubRoot = 'https://api.github.com';
+        $strOrganisation = 'Unit-Test-ORG';
+        $strRepository1 = 'testRepository';
+        $strRepository2 = 'testRepository2';
+        $arrRepositories = [
+            [
+                'name' => $strRepository1,
+            ],
+            [
+                'name' => $strRepository2,
+            ],
+        ];
+        $arrExpectedRepositoryNames = [
+            $strRepository1,
+            $strRepository2,
+        ];
+
+        $mockGetGuzzleResponse = \Mockery::mock('\GuzzleHttp\Psr7\Response')
+            ->shouldReceive('getBody')
+            ->once()
+            ->andReturn(JSON_encode($arrRepositories))
+            ->mock();
+
+        $mockGuzzleConnection = \Mockery::mock('\GuzzleHttp\Client')
+            ->shouldReceive('request')
+            ->once()
+            ->with(
+                'GET',
+                "$strGithubRoot/orgs/$strOrganisation/repos",
+                [
+                    'json' => [],
+                ]
+            )
+            ->andReturn($mockGetGuzzleResponse)
+            ->mock();
+
+        $modelHelperGithub->setGuzzleConnection($mockGuzzleConnection); // inject guzzle
+
+        $arrPushStaticDirectoryResponse = $this->_invokeProtMethod($modelHelperGithub, 'listRepositories');
+
+        $this->assertEquals($arrExpectedRepositoryNames, $arrPushStaticDirectoryResponse);
+    }
 }
