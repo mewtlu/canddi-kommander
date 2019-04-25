@@ -332,6 +332,41 @@ class GithubTest
         $this->assertTrue($boolCreateBranchProtectionResponse);
     }
 
+    public function testDisableBranchProtection_missing()
+    {
+        $modelHelperGithub = \Canddi_Helper_Github::getInstance();
+
+        $strGithubRoot = 'https://api.github.com';
+        $strOrganisation = 'Unit-Test-ORG';
+        $strRepository = 'testRepository';
+        $strBranchName = 'testBranch';
+        $arrRules = [
+            $strBranchName => [
+                'example_rule' => true,
+            ]
+        ];
+
+
+        $mockGuzzleConnection = \Mockery::mock('\GuzzleHttp\Client')
+            ->shouldReceive('request')
+            ->once()
+            ->with(
+                'DELETE',
+                "$strGithubRoot/repos/$strOrganisation/$strRepository/branches/$strBranchName/protection",
+                [
+                    'json' => [],
+                ]
+            )
+            ->andThrow(new ResponseException(404, 'exception message', []))
+            ->mock();
+
+        $modelHelperGithub->setGuzzleConnection($mockGuzzleConnection); // inject guzzle
+
+        $boolCreateBranchProtectionResponse = $this->_invokeProtMethod($modelHelperGithub, 'disableBranchProtection', $strRepository, $arrRules);
+
+        $this->assertTrue($boolCreateBranchProtectionResponse);
+    }
+
     public function testCreateDefaultBranch()
     {
         $modelHelperGithub = \Canddi_Helper_Github::getInstance();
