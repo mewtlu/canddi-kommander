@@ -7,7 +7,7 @@
  **/
 class Canddi_Helper_Config
 {
-    use Canddi_Interface_Singleton;
+    use Canddi_Trait_Singleton;
 
     const STATIC_DIRECTORY = 'static';
     const GITHUB_CODEOWNERS_FILEPATH = self::STATIC_DIRECTORY . "/CODEOWNERS";

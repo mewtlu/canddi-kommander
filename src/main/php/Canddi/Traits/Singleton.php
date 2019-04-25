@@ -1,6 +1,6 @@
 <?php
 
-trait Canddi_Interface_Singleton {
+trait Canddi_Trait_Singleton {
   /**
    * This is an array (one per singleton)
    *
@@ -37,7 +37,7 @@ trait Canddi_Interface_Singleton {
    * @return  Canddi_Helper_Config_Abstract
    * @author  Tim Langley
    **/
-  public static function inject(Canddi_Helper_Config_Abstract $mockInstance)
+  public static function inject($mockInstance)
   {
       $strClass = get_called_class();
       self::$_arrConfigInstances[$strClass] = $mockInstance;
