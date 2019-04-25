@@ -10,7 +10,7 @@ use GuzzleHttp\Exception\RequestException;
 
 class Canddi_Helper_Github
 {
-  use Canddi_Interface_Singleton;
+  use Canddi_Trait_Singleton;
 
   const TEAM_MERGETODEV = 'canmergetodev';
   const GITHUB_ROOT_URL = 'https://api.github.com/';
