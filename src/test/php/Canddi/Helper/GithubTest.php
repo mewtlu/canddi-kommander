@@ -328,4 +328,64 @@ class GithubTest
 
         $this->assertTrue($boolCreateDefaultBranchResponse);
     }
+
+    public function testPushStaticDirectory_exists()
+    {
+        $modelHelperGithub = \Canddi_Helper_Github::getInstance();
+
+        $strGithubRoot = 'https://api.github.com';
+        $strOrganisation = 'Unit-Test-ORG';
+        $strRepository = 'testRepository';
+        $strSha = 'exampleshastring';
+        $strBranchName = 'testBranch';
+        $strFilename = 'CODEOWNERS';
+        $strGithubCommitMsg = "Add $strFilename";
+        $strFileContents = '* @Deep-Web-Technologies/canmergetodev';
+
+        $mockGetGuzzleResponse = \Mockery::mock('\GuzzleHttp\Psr7\Response')
+            ->shouldReceive('getBody')
+            ->once()
+            ->andReturn(JSON_encode([
+                'sha' => $strSha
+            ]))
+            ->mock();
+        $mockPutGuzzleResponse = \Mockery::mock('\GuzzleHttp\Psr7\Response')
+            ->shouldReceive('getBody')
+            ->once()
+            ->andReturn(JSON_encode([]))
+            ->mock();
+
+        $mockGuzzleConnection = \Mockery::mock('\GuzzleHttp\Client')
+            ->shouldReceive('request')
+            ->once()
+            ->with(
+                'GET',
+                "$strGithubRoot/repos/$strOrganisation/$strRepository/contents/.github/$strFilename",
+                [
+                    'json' => [],
+                ]
+            )
+            ->andReturn($mockGetGuzzleResponse)
+            ->shouldReceive('request')
+            ->once()
+            ->with(
+                'PUT',
+                "$strGithubRoot/repos/$strOrganisation/$strRepository/contents/.github/$strFilename",
+                [
+                    'json' => [
+                        "message" => sprintf($strGithubCommitMsg, $strFilename),
+                        "content" => base64_encode($strFileContents),
+                        "sha" => $strSha,
+                    ],
+                ]
+            )
+            ->andReturn($mockPutGuzzleResponse)
+            ->mock();
+
+        $modelHelperGithub->setGuzzleConnection($mockGuzzleConnection); // inject guzzle
+
+        $boolPushStaticDirectoryResponse = $this->_invokeProtMethod($modelHelperGithub, 'pushStaticDirectory', $strRepository, $strBranchName);
+
+        $this->assertTrue($boolPushStaticDirectoryResponse);
+    }
 }
