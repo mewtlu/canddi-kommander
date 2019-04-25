@@ -1,6 +1,6 @@
 <?php
 
-namespace Canddi\Kommander\Helper\Config;
+namespace Canddi\Kommander\Helper;
 use Canddi\Kommander\TestCase;
 use Canddi\Kommander\Exception\Fatal\ResponseException;
 use GuzzleHttp\Client as GuzzleClient;
