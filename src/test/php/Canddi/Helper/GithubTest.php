@@ -465,8 +465,12 @@ class GithubTest
         $strSha = 'exampleshastring';
         $strBranchName = 'testBranch';
         $strFilename = 'CODEOWNERS';
-        $strGithubCommitMsg = "Add $strFilename";
+        $strGithubCommitMsg = "Add %s";
         $strFileContents = '* @Deep-Web-Technologies/canmergetodev';
+        $arrStaticFiles = [
+            $strFilename => $strFileContents,
+        ];
+        $modelHelperGithub->setStaticFiles($arrStaticFiles);
 
         $mockGetGuzzleResponse = \Mockery::mock('\GuzzleHttp\Psr7\Response')
             ->shouldReceive('getBody')
@@ -525,8 +529,12 @@ class GithubTest
         $strSha = 'exampleshastring';
         $strBranchName = 'testBranch';
         $strFilename = 'CODEOWNERS';
-        $strGithubCommitMsg = "Add $strFilename";
+        $strGithubCommitMsg = "Add %s";
         $strFileContents = '* @Deep-Web-Technologies/canmergetodev';
+        $arrStaticFiles = [
+            $strFilename => $strFileContents,
+        ];
+        $modelHelperGithub->setStaticFiles($arrStaticFiles);
 
         $mockGetGuzzleResponse = \Mockery::mock('\GuzzleHttp\Psr7\Response')
             ->shouldReceive('getBody')
