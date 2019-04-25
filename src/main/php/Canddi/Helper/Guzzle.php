@@ -19,5 +19,6 @@ class Canddi_GuzzleFactory
 
       return self::$_guzzleConnection = new Client($arrDefaults);
     }
+    return self::$_guzzleConnection;
   }
 }
